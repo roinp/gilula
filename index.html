@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="ka">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GILULA SPORT — სპორტული სიახლეები</title>
+  <meta name="description" content="ქართული და მსოფლიო სპორტის უახლესი სიახლეები: ფეხბურთი, კალათბურთი, რაგბი, MMA და სხვა." />
+
+  <!-- Fonts: Ubuntu (latin) + Noto Sans Georgian (georgian) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@400;500;700&family=Noto+Sans+Georgian:wght@400;500;700;800&display=swap" rel="stylesheet" />
+
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- ============ HEADER / NAVBAR ============ -->
+  <header class="header">
+    <div class="container header__inner">
+
+      <a href="#" class="logo">
+        <img src="logo.jpg" alt="Gilula Sport" class="logo__img" />
+        <span class="logo__text">GILULA<span class="accent">SPORT</span></span>
+      </a>
+
+      <nav class="nav" id="nav">
+        <ul class="nav__list">
+          <li><a href="#" class="nav__link is-active">ქართული სპორტი</a></li>
+          <li><a href="#" class="nav__link">ფეხბურთი</a></li>
+          <li><a href="#" class="nav__link">კალათბურთი</a></li>
+          <li><a href="#" class="nav__link">რაგბი</a></li>
+          <li><a href="#" class="nav__link">ვიდეო</a></li>
+          <li><a href="#" class="nav__link">MMA</a></li>
+          <li><a href="#" class="nav__link">სხვა</a></li>
+        </ul>
+      </nav>
+
+      <button class="burger" id="burger" aria-label="მენიუ" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+
+    </div>
+  </header>
+
+  <!-- ============ SLIDER ============ -->
+  <section class="slider" id="slider">
+    <div class="slider__track" id="sliderTrack">
+
+      <!-- slide 1 -->
+      <article class="slide slide--1">
+        <div class="container slide__inner">
+          <div class="slide__text">
+            <span class="badge">ფეხბურთი</span>
+            <h2 class="slide__title">ხვიჩა კვარაცხელია</h2>
+            <p class="slide__role">ეროვნული ნაკრები · ნახევარმცველი</p>
+            <p class="slide__desc">ქართული ფეხბურთის დღევანდელი სახე — მოთამაშე, რომელმაც საქართველო ევროპის ჩემპიონატზე გაიყვანა.</p>
+            <a href="#news" class="btn">სრულად ნახვა</a>
+          </div>
+          <div class="slide__visual">
+            <img src="images/kvaratskhelia.png" alt="ხვიჩა კვარაცხელია" class="slide__photo" />
+            <span class="slide__number">7</span>
+          </div>
+        </div>
+      </article>
+
+      <!-- slide 2 -->
+      <article class="slide slide--2">
+        <div class="container slide__inner">
+          <div class="slide__text">
+            <span class="badge">ფეხბურთი</span>
+            <h2 class="slide__title">გიორგი მამარდაშვილი</h2>
+            <p class="slide__role">ეროვნული ნაკრები · მეკარე</p>
+            <p class="slide__desc">„ევროპის კედელი“ — მეკარე, რომლის სახელიც ევროპის ტოპ კლუბებთან იხსენიება.</p>
+            <a href="#news" class="btn">სრულად ნახვა</a>
+          </div>
+          <div class="slide__visual">
+            <img src="images/mamardashvili.jpg" alt="გიორგი მამარდაშვილი" class="slide__photo" />
+            <span class="slide__number">1</span>
+          </div>
+        </div>
+      </article>
+
+      <!-- slide 3 -->
+      <article class="slide slide--3">
+        <div class="container slide__inner">
+          <div class="slide__text">
+            <span class="badge">ლეგენდა</span>
+            <h2 class="slide__title">კახა კალაძე</h2>
+            <p class="slide__role">ეროვნული ნაკრები · მცველი</p>
+            <p class="slide__desc">ორგზის ჩემპიონთა ლიგის მფლობელი და ქართული ფეხბურთის ერთ-ერთი უდიდესი სახელი.</p>
+            <a href="#news" class="btn">სრულად ნახვა</a>
+          </div>
+          <div class="slide__visual">
+            <img src="images/kaladze.png" alt="კახა კალაძე" class="slide__photo" />
+            <span class="slide__number">4</span>
+          </div>
+        </div>
+      </article>
+
+      <!-- slide 4 -->
+      <article class="slide slide--4">
+        <div class="container slide__inner">
+          <div class="slide__text">
+            <span class="badge">ლეგენდა</span>
+            <h2 class="slide__title">გიორგი კინკლაძე</h2>
+            <p class="slide__role">ეროვნული ნაკრები · ნახევარმცველი</p>
+            <p class="slide__desc">ტექნიკის ოსტატი, რომელიც ინგლისურ ფეხბურთში დღემდე კულტურულ ფიგურად რჩება.</p>
+            <a href="#news" class="btn">სრულად ნახვა</a>
+          </div>
+          <div class="slide__visual">
+            <img src="images/kinkladze.jpg" alt="გიორგი კინკლაძე" class="slide__photo" />
+            <span class="slide__number">10</span>
+          </div>
+        </div>
+      </article>
+
+      <!-- slide 5 -->
+      <article class="slide slide--5">
+        <div class="container slide__inner">
+          <div class="slide__text">
+            <span class="badge">ლეგენდა</span>
+            <h2 class="slide__title">შოთა არველაძე</h2>
+            <p class="slide__role">ეროვნული ნაკრები · თავდამსხმელი</p>
+            <p class="slide__desc">ეროვნული ნაკრების ისტორიის ერთ-ერთი საუკეთესო ბომბარდირი და მწვრთნელი.</p>
+            <a href="#news" class="btn">სრულად ნახვა</a>
+          </div>
+          <div class="slide__visual">
+            <img src="images/arveladze.png" alt="შოთა არველაძე" class="slide__photo" />
+            <span class="slide__number">9</span>
+          </div>
+        </div>
+      </article>
+
+    </div>
+
+    <button class="slider__arrow slider__arrow--prev" id="prevBtn" aria-label="წინა">&#10094;</button>
+    <button class="slider__arrow slider__arrow--next" id="nextBtn" aria-label="შემდეგი">&#10095;</button>
+    <div class="slider__dots" id="sliderDots"></div>
+  </section>
+
+  <!-- ============ LATEST NEWS ============ -->
+  <section class="news section" id="news">
+    <div class="container">
+
+      <div class="section__head">
+        <h2 class="section__title">სპორტული <span class="accent">სიახლეები</span></h2>
+        <p class="section__subtitle">ყველაზე მნიშვნელოვანი ამბები ქართული და მსოფლიო სპორტიდან</p>
+      </div>
+
+      <!-- 12 articles are rendered here by script.js -->
+      <div class="news__grid" id="newsGrid"></div>
+
+      <div class="section__foot">
+        <a href="#" class="btn btn--outline">ყველას ნახვა</a>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ============ CONTACT ============ -->
+  <section class="contact section" id="contact">
+    <div class="container">
+
+      <div class="section__head">
+        <h2 class="section__title">საკონტაქტო <span class="accent">ინფორმაცია</span></h2>
+        <p class="section__subtitle">დაგვიკავშირდით ან გამოგვყევით სოციალურ ქსელებში</p>
+      </div>
+
+      <div class="contact__grid">
+
+        <a href="https://facebook.com" class="contact__card" target="_blank" rel="noopener">
+          <span class="contact__icon">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M13.5 22v-8h2.7l.4-3.1h-3.1V8.9c0-.9.25-1.5 1.55-1.5h1.65V4.6c-.3-.04-1.3-.13-2.45-.13-2.4 0-4.05 1.47-4.05 4.17v2.26H7.5V14h2.7v8h3.3z"/></svg>
+          </span>
+          <span class="contact__name">Facebook</span>
+          <span class="contact__value">/gilulasport</span>
+        </a>
+
+        <a href="https://instagram.com" class="contact__card" target="_blank" rel="noopener">
+          <span class="contact__icon">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.2c3.2 0 3.6 0 4.85.07 1.17.05 1.8.25 2.23.41.56.22.96.48 1.38.9.42.42.68.82.9 1.38.16.42.36 1.06.41 2.23.06 1.25.07 1.65.07 4.85s0 3.6-.07 4.85c-.05 1.17-.25 1.8-.41 2.23a3.7 3.7 0 0 1-.9 1.38c-.42.42-.82.68-1.38.9-.42.16-1.06.36-2.23.41-1.25.06-1.65.07-4.85.07s-3.6 0-4.85-.07c-1.17-.05-1.8-.25-2.23-.41a3.7 3.7 0 0 1-1.38-.9 3.7 3.7 0 0 1-.9-1.38c-.16-.42-.36-1.06-.41-2.23C2.2 15.6 2.2 15.2 2.2 12s0-3.6.07-4.85c.05-1.17.25-1.8.41-2.23.22-.56.48-.96.9-1.38.42-.42.82-.68 1.38-.9.42-.16 1.06-.36 2.23-.41C8.4 2.2 8.8 2.2 12 2.2zm0 1.8c-3.14 0-3.5.01-4.74.07-1.14.05-1.76.24-2.17.4-.55.21-.94.47-1.35.88-.41.41-.67.8-.88 1.35-.16.41-.35 1.03-.4 2.17C2.4 8.5 2.4 8.86 2.4 12s.01 3.5.07 4.74c.05 1.14.24 1.76.4 2.17.21.55.47.94.88 1.35.41.41.8.67 1.35.88.41.16 1.03.35 2.17.4 1.24.06 1.6.07 4.74.07s3.5-.01 4.74-.07c1.14-.05 1.76-.24 2.17-.4.55-.21.94-.47 1.35-.88.41-.41.67-.8.88-1.35.16-.41.35-1.03.4-2.17.06-1.24.07-1.6.07-4.74s-.01-3.5-.07-4.74c-.05-1.14-.24-1.76-.4-2.17a3.6 3.6 0 0 0-.88-1.35 3.6 3.6 0 0 0-1.35-.88c-.41-.16-1.03-.35-2.17-.4C15.5 4.01 15.14 4 12 4zm0 3.03a4.97 4.97 0 1 1 0 9.94 4.97 4.97 0 0 1 0-9.94zm0 1.8a3.17 3.17 0 1 0 0 6.34 3.17 3.17 0 0 0 0-6.34zm5.2-3.2a1.16 1.16 0 1 1 0 2.32 1.16 1.16 0 0 1 0-2.32z"/></svg>
+          </span>
+          <span class="contact__name">Instagram</span>
+          <span class="contact__value">@gilulasport</span>
+        </a>
+
+        <a href="https://wa.me/995500000000" class="contact__card" target="_blank" rel="noopener">
+          <span class="contact__icon">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12.04 2C6.6 2 2.2 6.4 2.2 11.84c0 1.74.46 3.44 1.32 4.94L2.1 22l5.35-1.4a9.83 9.83 0 0 0 4.59 1.16h.01c5.43 0 9.84-4.4 9.84-9.84A9.78 9.78 0 0 0 19 4.87 9.78 9.78 0 0 0 12.04 2zm0 1.8c2.15 0 4.17.84 5.69 2.36a7.99 7.99 0 0 1 2.36 5.69c0 4.44-3.61 8.04-8.05 8.04a8.04 8.04 0 0 1-4.1-1.12l-.29-.18-3.05.8.81-2.97-.19-.3a8.01 8.01 0 0 1-1.23-4.28c0-4.44 3.62-8.04 8.05-8.04zM8.5 7.1c-.17 0-.44.06-.67.31-.23.25-.88.86-.88 2.1s.9 2.43 1.03 2.6c.13.16 1.75 2.78 4.28 3.79 2.1.83 2.53.67 2.99.62.46-.04 1.47-.6 1.68-1.18.2-.58.2-1.08.15-1.18-.06-.1-.23-.16-.48-.29-.25-.12-1.47-.72-1.7-.8-.23-.09-.4-.13-.56.12-.17.25-.64.8-.79.97-.14.16-.29.19-.54.06-.25-.12-1.05-.39-2-1.23a7.46 7.46 0 0 1-1.38-1.72c-.15-.25-.02-.38.11-.5.11-.11.25-.29.37-.44.12-.15.16-.25.25-.42.08-.16.04-.31-.02-.44-.06-.12-.55-1.35-.76-1.84-.2-.48-.4-.42-.55-.42h-.47z"/></svg>
+          </span>
+          <span class="contact__name">WhatsApp</span>
+          <span class="contact__value">+995 500 00 00 00</span>
+        </a>
+
+        <a href="mailto:info@gilulasport.ge" class="contact__card">
+          <span class="contact__icon">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 5h18a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1zm1.6 2L12 12.3 19.4 7H4.6zM20 8.5l-7.4 5.3a1 1 0 0 1-1.2 0L4 8.5V17h16V8.5z"/></svg>
+          </span>
+          <span class="contact__name">Email</span>
+          <span class="contact__value">info@gilulasport.ge</span>
+        </a>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ FOOTER ============ -->
+  <footer class="footer">
+    <div class="container footer__inner">
+      <p>&copy; <span id="year"></span> GILULA SPORT — ყველა უფლება დაცულია.</p>
+      <p class="footer__note">სპორტული სიახლეები ყოველდღე</p>
+    </div>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
