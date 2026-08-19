@@ -391,9 +391,11 @@ img { max-width: 100%; display: block; }
 
 .contact__grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 24px;
+  grid-template-columns: repeat(5, 1fr); /* Facebook, Instagram, YouTube, WhatsApp, Email */
+  gap: 20px;
 }
+
+.contact__value { word-break: break-word; }
 
 .contact__card {
   padding: 30px 20px;
@@ -432,7 +434,14 @@ img { max-width: 100%; display: block; }
   font-size: 14px;
   color: var(--muted);
 }
-.footer__inner { display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
+.footer__inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+.footer .logo__text { font-size: 17px; }
 
 /* ============================================================
    10. Responsive
@@ -440,7 +449,8 @@ img { max-width: 100%; display: block; }
 
 /* laptop: 3 cards per row */
 @media (max-width: 1100px) {
-  .news__grid { grid-template-columns: repeat(3, 1fr); }
+  .news__grid,
+  .contact__grid { grid-template-columns: repeat(3, 1fr); }
 }
 
 /* tablet: burger menu, 2 cards per row */
