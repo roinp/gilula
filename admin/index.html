@@ -68,10 +68,6 @@
         <svg viewBox="0 0 24 24"><path d="M3 5h8v6H3V5zm10 0h8v6h-8V5zM3 13h8v6H3v-6zm10 0h8v6h-8v-6z"/></svg>
         კატეგორიები
       </button>
-      <button class="sidebar__link" data-view="slider">
-        <svg viewBox="0 0 24 24"><path d="M7 5h10a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2zM2 8h2v8H2V8zm18 0h2v8h-2V8z"/></svg>
-        სლაიდერი
-      </button>
     </nav>
 
     <div class="sidebar__foot">
@@ -116,7 +112,8 @@
 
       <!-- ===== latest news on the homepage ===== -->
       <section class="view" data-view="home">
-        <p class="hint">აქ ჩამოთვლილია სიახლეები, რომლებიც მთავარ გვერდზე, „სპორტული სიახლეების“ ბლოკში ჩანს. ისრებით შეცვალეთ თანმიმდევრობა.</p>
+        <p class="hint">აქ ჩამოთვლილია სიახლეები, რომლებიც მთავარ გვერდზე ჩანს. ისრებით შეცვალეთ თანმიმდევრობა.
+          <b>პირველი 7 ავტომატურად ხვდება სლაიდერშიც</b> — სლაიდერისთვის ცალკე ინფორმაციის შეყვანა აღარ არის საჭირო.</p>
         <div class="panel" id="homeList"></div>
       </section>
 
@@ -129,19 +126,13 @@
         <div class="panel" id="categoryList"></div>
       </section>
 
-      <!-- ===== slider ===== -->
-      <section class="view" data-view="slider">
-        <p class="hint">სლაიდები მთავარ გვერდზე ჩანს იმ თანმიმდევრობით, რომლითაც აქ არის დალაგებული.</p>
-        <div class="panel" id="slideList"></div>
-      </section>
-
     </div>
   </main>
 </div>
 
 
 <!-- ============================================================
-     FORM DRAWER  (article / category / slide)
+     FORM DRAWER  (article / category)
      ============================================================ -->
 <div class="drawer" id="drawer" hidden>
   <div class="drawer__backdrop" data-close></div>

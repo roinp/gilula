@@ -375,6 +375,9 @@ svg  { width: 20px; height: 20px; fill: currentColor; flex: none; }
   background: linear-gradient(135deg, #0d3d24, #0a0a0a);
 }
 
+/* marks where the slider stops and the plain news list begins */
+.row--slider-edge { border-bottom: 2px solid rgba(0, 224, 90, .45); }
+
 .row__main  { flex: 1; min-width: 0; }
 .row__title {
   font-size: 15px;

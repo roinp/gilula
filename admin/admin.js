@@ -5,11 +5,10 @@
     3. Loading & navigation
     4. Dashboard
     5. Articles
-    6. Latest news (homepage order)
+    6. Latest news (homepage order + slider)
     7. Categories
-    8. Slider
-    9. Form pieces (image picker, text editor)
-   10. Drawer
+    8. Form pieces (image picker, text editor)
+    9. Drawer
    ============================================================ */
 
 /* ------------------------------------------------------------
@@ -130,17 +129,18 @@ $("logoutBtn").addEventListener("click", async () => {
    3. Loading & navigation
    ------------------------------------------------------------ */
 
-const state = { categories: [], articles: [], slides: [], view: "dashboard" };
+const state = { categories: [], articles: [], view: "dashboard" };
+
+/** How many of the homepage articles also appear in the slider. */
+const SLIDER_COUNT = 7;
 
 async function loadAll() {
-  const [categories, articles, slides] = await Promise.all([
+  const [categories, articles] = await Promise.all([
     API.getCategories(),
-    API.getArticles({ includeHidden: true }),
-    API.getSlides(true)
+    API.getArticles({ includeHidden: true })
   ]);
   state.categories = categories;
   state.articles   = articles;
-  state.slides     = slides;
 }
 
 async function start() {
@@ -158,14 +158,12 @@ const VIEW_TITLES = {
   dashboard:  "დაფა",
   articles:   "სიახლეები",
   home:       "მთავარი გვერდი",
-  categories: "კატეგორიები",
-  slider:     "სლაიდერი"
+  categories: "კატეგორიები"
 };
 
 const ADD_LABELS = {
   articles:   "+ ახალი სიახლე",
-  categories: "+ ახალი კატეგორია",
-  slider:     "+ ახალი სლაიდი"
+  categories: "+ ახალი კატეგორია"
 };
 
 function switchView(view) {
@@ -192,7 +190,6 @@ document.querySelectorAll(".sidebar__link")
 $("topAddBtn").addEventListener("click", () => {
   if (state.view === "articles")   openArticleForm(null);
   if (state.view === "categories") openCategoryForm(null);
-  if (state.view === "slider")     openSlideForm(null);
 });
 
 /* mobile sidebar */
@@ -208,7 +205,6 @@ function render() {
   if (state.view === "articles")   renderArticles();
   if (state.view === "home")       renderHome();
   if (state.view === "categories") renderCategories();
-  if (state.view === "slider")     renderSlides();
 }
 
 
@@ -224,8 +220,8 @@ function renderDashboard() {
     ["გამოქვეყნებული",    published],
     ["დამალული",          state.articles.length - published],
     ["მთავარ გვერდზე",    state.articles.filter(a => a.show_on_home && a.published).length],
-    ["კატეგორია",         state.categories.length],
-    ["აქტიური სლაიდი",    state.slides.filter(s => s.visible).length]
+    ["სლაიდერში",         Math.min(SLIDER_COUNT, homeArticles().filter(a => a.published).length)],
+    ["კატეგორია",         state.categories.length]
   ].map(([label, value]) => `
     <div class="stat">
       <div class="stat__value">${value}</div>
@@ -287,8 +283,8 @@ function renderArticles() {
             <div class="row__title">${esc(article.title)}</div>
             <div class="row__sub">
               <span class="tag">${esc(article.categories ? article.categories.name : "კატეგორიის გარეშე")}</span>
+              <span>${esc(article.author || "ავტორის გარეშე")}</span>
               <span>${formatDate(article.published_at)}</span>
-              <span>${esc(article.read_time)}</span>
             </div>
           </div>
 
@@ -336,16 +332,17 @@ function renderHome() {
 
   $("homeList").innerHTML = list.length
     ? list.map((article, index) => `
-        <div class="row">
+        <div class="row${index === SLIDER_COUNT - 1 ? " row--slider-edge" : ""}">
           <img class="row__thumb" src="${previewSrc(article.image_url)}" alt=""
                onerror="this.src='${PLACEHOLDER}'" />
 
           <div class="row__main">
             <div class="row__title">${index + 1}. ${esc(article.title)}</div>
             <div class="row__sub">
-              <span class="tag ${article.published ? "tag--green" : "tag--yellow"}">
+              ${index < SLIDER_COUNT ? `<span class="tag tag--green">სლაიდერში</span>` : ""}
+              <span class="tag ${article.published ? "tag--muted" : "tag--yellow"}">
                 ${article.published ? "ჩანს საიტზე" : "დამალულია — არ ჩანს"}</span>
-              <span>${esc(article.categories ? article.categories.name : "კატეგორიის გარეშე")}</span>
+              <span>${esc(article.author || "ავტორის გარეშე")}</span>
             </div>
           </div>
 
@@ -422,61 +419,6 @@ function removeCategory(id) {
   const extra = count ? `\n${count} სიახლე დარჩება, მაგრამ კატეგორიის გარეშე.` : "";
   if (!confirm(`წავშალოთ კატეგორია „${category.name}“?${extra}`)) return;
   save(() => API.deleteCategory(id), "კატეგორია წაიშალა");
-}
-
-
-/* ------------------------------------------------------------
-   8. Slider
-   ------------------------------------------------------------ */
-
-function renderSlides() {
-  const list = state.slides;
-
-  $("slideList").innerHTML = list.length
-    ? list.map((slide, index) => `
-        <div class="row">
-          <img class="row__thumb" src="${previewSrc(slide.image_url)}" alt=""
-               onerror="this.src='${PLACEHOLDER}'" />
-
-          <div class="row__main">
-            <div class="row__title">${index + 1}. ${esc(slide.title)}</div>
-            <div class="row__sub">
-              ${slide.badge ? `<span class="tag tag--green">${esc(slide.badge)}</span>` : ""}
-              <span>${esc(slide.role || "—")}</span>
-            </div>
-          </div>
-
-          <div class="row__switches">
-            ${switchHTML("ჩანს", slide.visible, `onchange="toggleSlide(${slide.id}, this.checked)"`)}
-          </div>
-
-          <div class="row__actions">
-            <button class="icon-btn" title="ზემოთ" ${index === 0 ? "disabled" : ""}
-                    onclick="moveSlide(${slide.id}, -1)">${ICON.up}</button>
-            <button class="icon-btn" title="ქვემოთ" ${index === list.length - 1 ? "disabled" : ""}
-                    onclick="moveSlide(${slide.id}, 1)">${ICON.down}</button>
-            <button class="icon-btn" title="რედაქტირება"
-                    onclick="openSlideForm(${slide.id})">${ICON.edit}</button>
-            <button class="icon-btn icon-btn--danger" title="წაშლა"
-                    onclick="removeSlide(${slide.id})">${ICON.trash}</button>
-          </div>
-        </div>`).join("")
-    : `<p class="empty">სლაიდები ჯერ არ დაგიმატებიათ.</p>`;
-}
-
-function toggleSlide(id, visible) {
-  save(() => API.updateSlide(id, { visible }), "შენახულია");
-}
-
-function moveSlide(id, direction) {
-  reorder([...state.slides], id, direction, (slide, index) =>
-    API.updateSlide(slide.id, { sort_order: index + 1 }));
-}
-
-function removeSlide(id) {
-  const slide = state.slides.find(s => s.id === id);
-  if (!confirm(`წავშალოთ სლაიდი „${slide.title}“?`)) return;
-  save(() => API.deleteSlide(id), "სლაიდი წაიშალა");
 }
 
 
@@ -654,6 +596,12 @@ function openArticleForm(id) {
       <input type="text" name="title" required value="${esc(article.title || "")}" />
     </label>
 
+    <label class="field">
+      <span class="field__label">ავტორი</span>
+      <input type="text" name="author" value="${esc(article.author || "")}"
+             placeholder="სახელი გვარი" />
+    </label>
+
     <div class="field-row">
       <label class="field">
         <span class="field__label">კატეგორია</span>
@@ -709,6 +657,7 @@ function openArticleForm(id) {
   openDrawer(isNew ? "ახალი სიახლე" : "სიახლის რედაქტირება", body, (data, root) => {
     const values = {
       title:        data.get("title").trim(),
+      author:       data.get("author").trim(),
       excerpt:      data.get("excerpt").trim(),
       content:      root.querySelector(".editor__area").innerHTML.trim(),
       image_url:    data.get("image_url").trim(),
@@ -755,78 +704,6 @@ function openCategoryForm(id) {
     return save(() => API.updateCategory(id, values), "ცვლილებები შენახულია");
   });
 }
-
-/* ---------- slide form ---------- */
-
-function openSlideForm(id) {
-  const slide = state.slides.find(s => s.id === id) || {};
-  const isNew = !id;
-
-  const body = `
-    <label class="field">
-      <span class="field__label">სათაური *</span>
-      <input type="text" name="title" required value="${esc(slide.title || "")}"
-             placeholder="მაგ. ხვიჩა კვარაცხელია" />
-    </label>
-
-    <div class="field-row">
-      <label class="field">
-        <span class="field__label">იარლიყი (მწვანე ნიშანი)</span>
-        <input type="text" name="badge" value="${esc(slide.badge || "")}" placeholder="ფეხბურთი" />
-      </label>
-
-      <label class="field">
-        <span class="field__label">ნომერი (სურვილისამებრ)</span>
-        <input type="text" name="number" value="${esc(slide.number || "")}" placeholder="7" />
-      </label>
-    </div>
-
-    <label class="field">
-      <span class="field__label">ქვესათაური</span>
-      <input type="text" name="role" value="${esc(slide.role || "")}"
-             placeholder="ეროვნული ნაკრები · ნახევარმცველი" />
-    </label>
-
-    <label class="field">
-      <span class="field__label">ტექსტი</span>
-      <textarea name="description" rows="3">${esc(slide.description || "")}</textarea>
-    </label>
-
-    <div class="field">
-      <span class="field__label">სურათი</span>
-      ${pickerHTML("image_url", slide.image_url)}
-    </div>
-
-    <label class="field">
-      <span class="field__label">ღილაკის ბმული</span>
-      <input type="text" name="link_url" value="${esc(slide.link_url || "")}"
-             placeholder="#news  ან  article.html?id=12" />
-    </label>
-
-    <div class="field">
-      ${switchHTML("ჩანს საიტზე", isNew ? true : slide.visible, 'name="visible"')}
-    </div>`;
-
-  openDrawer(isNew ? "ახალი სლაიდი" : "სლაიდის რედაქტირება", body, data => {
-    const values = {
-      title:       data.get("title").trim(),
-      badge:       data.get("badge").trim(),
-      number:      data.get("number").trim(),
-      role:        data.get("role").trim(),
-      description: data.get("description").trim(),
-      image_url:   data.get("image_url").trim(),
-      link_url:    data.get("link_url").trim(),
-      visible:     data.get("visible") === "on"
-    };
-
-    if (isNew) {
-      values.sort_order = state.slides.length + 1;
-      return save(() => API.createSlide(values), "სლაიდი დაემატა");
-    }
-    return save(() => API.updateSlide(id, values), "ცვლილებები შენახულია");
-  });
-}
-
 
 /* ------------------------------------------------------------
    Boot — skip the login screen if the session is still valid.

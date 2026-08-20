@@ -30,6 +30,12 @@ async function renderArticle() {
                onerror="this.closest('.article__figure').remove()" />
         </figure>` : ""}
 
+      ${article.author ? `
+        <p class="article__author">
+          <span class="article__author-label">ავტორი:</span>
+          <span class="article__author-name">${esc(article.author)}</span>
+        </p>` : ""}
+
       ${article.excerpt ? `<p class="article__lead">${esc(article.excerpt)}</p>` : ""}
 
       <div class="article__content">${article.content || ""}</div>

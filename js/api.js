@@ -97,26 +97,6 @@
       return run(sb.from("articles").delete().eq("id", id));
     },
 
-    /* ---------- slider ---------- */
-
-    getSlides(includeHidden = false) {
-      let q = sb.from("slides").select("*");
-      if (!includeHidden) q = q.eq("visible", true);
-      return run(q.order("sort_order").order("id"));
-    },
-
-    createSlide(values) {
-      return run(sb.from("slides").insert(values).select().single());
-    },
-
-    updateSlide(id, values) {
-      return run(sb.from("slides").update(values).eq("id", id).select().single());
-    },
-
-    deleteSlide(id) {
-      return run(sb.from("slides").delete().eq("id", id));
-    },
-
     /* ---------- image upload ---------- */
 
     /** Uploads a file to the public "media" bucket and returns its URL. */

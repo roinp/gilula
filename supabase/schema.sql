@@ -20,6 +20,7 @@ create table if not exists categories (
 create table if not exists articles (
   id            bigint generated always as identity primary key,
   title         text        not null,
+  author        text        not null default '',
   excerpt       text        not null default '',
   content       text        not null default '',   -- HTML from the admin editor
   image_url     text        not null default '',   -- featured image
@@ -33,24 +34,12 @@ create table if not exists articles (
   created_at    timestamptz not null default now()
 );
 
--- homepage slider items
-create table if not exists slides (
-  id          bigint generated always as identity primary key,
-  badge       text        not null default '',   -- small green pill, e.g. "ფეხბურთი"
-  title       text        not null,
-  role        text        not null default '',   -- green sub-line
-  description text        not null default '',
-  image_url   text        not null default '',
-  number      text        not null default '',   -- jersey number badge (optional)
-  link_url    text        not null default '',   -- where the button points
-  visible     boolean     not null default true,
-  sort_order  int         not null default 0,
-  created_at  timestamptz not null default now()
-);
+-- NOTE: there is no separate table for the homepage slider.
+-- The slider shows the first 7 articles of the "Latest News" order,
+-- so the content is entered only once.
 
 create index if not exists articles_category_idx  on articles (category_id);
 create index if not exists articles_published_idx on articles (published, published_at desc);
-create index if not exists slides_order_idx       on slides (visible, sort_order);
 
 
 -- ------------------------------------------------------------
@@ -61,7 +50,6 @@ create index if not exists slides_order_idx       on slides (visible, sort_order
 
 alter table categories enable row level security;
 alter table articles   enable row level security;
-alter table slides     enable row level security;
 
 -- categories: everyone reads, only admins write
 drop policy if exists "categories read"  on categories;
@@ -76,14 +64,6 @@ drop policy if exists "articles write"       on articles;
 create policy "articles read public" on articles for select to anon          using (published = true);
 create policy "articles read admin"  on articles for select to authenticated using (true);
 create policy "articles write"       on articles for all    to authenticated using (true) with check (true);
-
--- slides: visitors see visible ones, admins see all
-drop policy if exists "slides read public" on slides;
-drop policy if exists "slides read admin"  on slides;
-drop policy if exists "slides write"       on slides;
-create policy "slides read public" on slides for select to anon          using (visible = true);
-create policy "slides read admin"  on slides for select to authenticated using (true);
-create policy "slides write"       on slides for all    to authenticated using (true) with check (true);
 
 
 -- ------------------------------------------------------------
@@ -121,18 +101,8 @@ insert into categories (name, sort_order) values
   ('სხვა',           7)
 on conflict (name) do nothing;
 
-insert into slides (badge, title, role, description, image_url, number, sort_order)
-select * from (values
-  ('ფეხბურთი', 'ხვიჩა კვარაცხელია',  'ეროვნული ნაკრები · ნახევარმცველი', 'ქართული ფეხბურთის დღევანდელი სახე — მოთამაშე, რომელმაც საქართველო ევროპის ჩემპიონატზე გაიყვანა.', 'images/kvaratskhelia.png', '7',  1),
-  ('ფეხბურთი', 'გიორგი მამარდაშვილი', 'ეროვნული ნაკრები · მეკარე',        '„ევროპის კედელი“ — მეკარე, რომლის სახელიც ევროპის ტოპ კლუბებთან იხსენიება.',                        'images/mamardashvili.jpg', '1',  2),
-  ('ლეგენდა',  'კახა კალაძე',         'ეროვნული ნაკრები · მცველი',        'ორგზის ჩემპიონთა ლიგის მფლობელი და ქართული ფეხბურთის ერთ-ერთი უდიდესი სახელი.',                     'images/kaladze.png',       '4',  3),
-  ('ლეგენდა',  'გიორგი კინკლაძე',     'ეროვნული ნაკრები · ნახევარმცველი', 'ტექნიკის ოსტატი, რომელიც ინგლისურ ფეხბურთში დღემდე კულტურულ ფიგურად რჩება.',                        'images/kinkladze.jpg',     '10', 4),
-  ('ლეგენდა',  'შოთა არველაძე',       'ეროვნული ნაკრები · თავდამსხმელი',  'ეროვნული ნაკრების ისტორიის ერთ-ერთი საუკეთესო ბომბარდირი და მწვრთნელი.',                            'images/arveladze.png',     '9',  5)
-) as v(badge, title, role, description, image_url, number, sort_order)
-where not exists (select 1 from slides);
-
-insert into articles (title, excerpt, content, image_url, image_fit, category_id, home_order, read_time, published_at)
-select v.title, v.excerpt, '<p>' || v.excerpt || '</p>', v.image_url, v.image_fit,
+insert into articles (title, author, excerpt, content, image_url, image_fit, category_id, home_order, read_time, published_at)
+select v.title, 'GILULA SPORT', v.excerpt, '<p>' || v.excerpt || '</p>', v.image_url, v.image_fit,
        (select id from categories c where c.name = v.category),
        v.home_order, v.read_time, v.published_at::timestamptz
 from (values

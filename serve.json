@@ -1,0 +1,5 @@
+{
+  "$comment": "ლოკალური სერვერის (npx serve) პარამეტრები. cleanUrls-ის გარეშე სერვერი /article.html?id=13 -ს გადაამისამართებს /article -ზე და კითხვის ნიშნის შემდეგ ყველაფერს კარგავს, ამიტომ სტატია ვერ იხსნება.",
+  "cleanUrls": false,
+  "trailingSlash": false
+}

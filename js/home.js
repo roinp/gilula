@@ -1,45 +1,55 @@
 /* ============================================================
    GILULA SPORT — homepage
-   1. Slider  (from the "slides" table)
-   2. Latest news  (from the "articles" table)
+
+   The slider and the news grid come from the SAME list of
+   articles, so content is entered only once in the admin panel:
+
+     slider     = the first 7 articles of the "Latest News" order
+     news grid  = the whole list
+
+   Change the order under "მთავარი გვერდი" in the admin panel and
+   both follow automatically.
    ============================================================ */
+
+const SLIDER_COUNT = 7;
 
 /* ---------- 1. Slider ---------- */
 
-async function renderSlider() {
-  const track    = document.getElementById("sliderTrack");
-  const dotsBox  = document.getElementById("sliderDots");
-  const slider   = document.getElementById("slider");
-  if (!track) return;
+function renderSlider(articles) {
+  const track   = document.getElementById("sliderTrack");
+  const dotsBox = document.getElementById("sliderDots");
+  const slider  = document.getElementById("slider");
 
-  let slides = [];
-  try {
-    slides = await API.getSlides();
-  } catch (error) {
-    console.error("სლაიდერი ვერ ჩაიტვირთა:", error.message);
-  }
-
+  const slides = articles.slice(0, SLIDER_COUNT);
   if (!slides.length) { slider.hidden = true; return; }
 
-  track.innerHTML = slides.map((slide, i) => `
-    <article class="slide slide--${(i % 5) + 1}">
-      <div class="container slide__inner">
-        <div class="slide__text">
-          ${slide.badge ? `<span class="badge">${esc(slide.badge)}</span>` : ""}
-          <h2 class="slide__title">${esc(slide.title)}</h2>
-          ${slide.role ? `<p class="slide__role">${esc(slide.role)}</p>` : ""}
-          ${slide.description ? `<p class="slide__desc">${esc(slide.description)}</p>` : ""}
-          <a href="${esc(slide.link_url || "#news")}" class="btn">სრულად ნახვა</a>
+  track.innerHTML = slides.map((article, i) => {
+    const category = article.categories ? article.categories.name : "";
+    const byline   = article.author
+      ? `ავტორი: ${esc(article.author)}`
+      : formatDate(article.published_at);
+
+    return `
+      <article class="slide slide--${(i % 5) + 1}">
+        <div class="container slide__inner">
+          <div class="slide__text">
+            ${category ? `<span class="badge">${esc(category)}</span>` : ""}
+            <h2 class="slide__title">${esc(article.title)}</h2>
+            <p class="slide__role">${byline}</p>
+            ${article.excerpt ? `<p class="slide__desc">${esc(article.excerpt)}</p>` : ""}
+            <a href="article.html?id=${article.id}" class="btn">სრულად ნახვა</a>
+          </div>
+          <div class="slide__visual${article.image_url ? "" : " no-photo"}">
+            ${article.image_url
+              ? `<img src="${esc(article.image_url)}" alt="${esc(article.title)}"
+                      class="slide__photo${article.image_fit === "contain" ? " slide__photo--contain" : ""}"
+                      onerror="this.parentElement.classList.add('no-photo');this.remove()" />`
+              : ""}
+            <span class="slide__number">${i + 1}</span>
+          </div>
         </div>
-        <div class="slide__visual${slide.image_url ? "" : " no-photo"}">
-          ${slide.image_url
-            ? `<img src="${esc(slide.image_url)}" alt="${esc(slide.title)}" class="slide__photo"
-                    onerror="this.parentElement.classList.add('no-photo');this.remove()" />`
-            : ""}
-          ${slide.number ? `<span class="slide__number">${esc(slide.number)}</span>` : ""}
-        </div>
-      </div>
-    </article>`).join("");
+      </article>`;
+  }).join("");
 
   /* --- slider behaviour --- */
   const total = slides.length;
@@ -85,15 +95,25 @@ async function renderSlider() {
 
 /* ---------- 2. Latest news ---------- */
 
-async function renderLatestNews() {
-  const grid = document.getElementById("newsGrid");
+async function renderHomepage() {
+  const grid   = document.getElementById("newsGrid");
+  const slider = document.getElementById("slider");
 
   try {
+    // one request feeds both the slider and the grid
     const articles = await API.getArticles({ homeOnly: true, limit: 12 });
-    grid.innerHTML = articles.length
-      ? articles.map(articleCard).join("")
-      : `<p class="notice">სიახლეები ჯერ არ დამატებულა.</p>`;
+
+    if (!articles.length) {
+      slider.hidden = true;
+      grid.innerHTML = `<p class="notice">სიახლეები ჯერ არ დამატებულა.</p>`;
+      return;
+    }
+
+    renderSlider(articles);
+    grid.innerHTML = articles.map(articleCard).join("");
+
   } catch (error) {
+    slider.hidden = true;
     showNotice(grid, "სიახლეები ვერ ჩაიტვირთა: " + error.message);
   }
 }
@@ -101,8 +121,7 @@ async function renderLatestNews() {
 /* ---------- start ---------- */
 
 if (requireDatabase(document.getElementById("newsGrid"))) {
-  renderSlider();
-  renderLatestNews();
+  renderHomepage();
 } else {
   document.getElementById("slider").hidden = true;
 }

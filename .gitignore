@@ -1,0 +1,65 @@
+# ============================================================
+#  GILULA SPORT — files that must never go to GitHub
+# ============================================================
+
+# ---------- საიდუმლო გასაღებები ----------
+# js/config.js განზრახ რჩება რეპოზიტორიაში: მასში მხოლოდ საჯარო
+# (publishable) გასაღებია, რომელსაც ისედაც ხედავს ყველა ვიზიტორი
+# ბრაუზერში, და საიტს ის სჭირდება გამოსაქვეყნებლად.
+# ეს ფაილები კი არასდროს არ უნდა აიტვირთოს:
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+secrets.json
+service-role.txt
+
+# ---------- Supabase CLI ----------
+.supabase/
+supabase/.temp/
+supabase/.branches/
+
+# ---------- Node / npm ----------
+node_modules/
+npm-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# ---------- ლოგები და დროებითი ფაილები ----------
+*.log
+tmp/
+temp/
+.cache/
+dist/
+build/
+
+# ---------- რედაქტორები ----------
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+*.bak
+*.orig
+
+# ---------- ოპერაციული სისტემა ----------
+# Windows
+Thumbs.db
+ehthumbs.db
+desktop.ini
+$RECYCLE.BIN/
+# macOS
+.DS_Store
+._*
+# Linux
+.directory
+
+# ---------- Claude Code ----------
+# ლოკალური პარამეტრები, მხოლოდ ამ კომპიუტერისთვის
+.claude/settings.local.json
+
+# ---------- დეპლოის სერვისები ----------
+.vercel/
+.netlify/
