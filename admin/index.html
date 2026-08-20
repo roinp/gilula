@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="ka">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ადმინ პანელი — GILULA SPORT</title>
+  <meta name="robots" content="noindex" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@400;500;700&family=Noto+Sans+Georgian:wght@400;500;700;800&display=swap" rel="stylesheet" />
+
+  <link rel="stylesheet" href="admin.css" />
+</head>
+<body>
+
+<!-- ============================================================
+     LOGIN
+     ============================================================ -->
+<div class="login" id="loginScreen">
+  <form class="login__box" id="loginForm">
+    <img src="../logo.jpg" alt="" class="login__logo" />
+    <h1 class="login__title">GILULA<span class="accent">SPORT</span></h1>
+    <p class="login__sub">ადმინისტრირების პანელი</p>
+
+    <label class="field">
+      <span class="field__label">ელფოსტა</span>
+      <input type="email" id="loginEmail" required autocomplete="username" />
+    </label>
+
+    <label class="field">
+      <span class="field__label">პაროლი</span>
+      <input type="password" id="loginPassword" required autocomplete="current-password" />
+    </label>
+
+    <p class="login__error" id="loginError" hidden></p>
+    <button type="submit" class="btn btn--block" id="loginBtn">შესვლა</button>
+  </form>
+</div>
+
+
+<!-- ============================================================
+     DASHBOARD
+     ============================================================ -->
+<div class="app" id="app" hidden>
+
+  <!-- ---------- sidebar ---------- -->
+  <aside class="sidebar" id="sidebar">
+    <a href="../index.html" class="sidebar__brand">
+      <img src="../logo.jpg" alt="" />
+      <span>GILULA<span class="accent">SPORT</span></span>
+    </a>
+
+    <nav class="sidebar__nav">
+      <button class="sidebar__link is-active" data-view="dashboard">
+        <svg viewBox="0 0 24 24"><path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/></svg>
+        დაფა
+      </button>
+      <button class="sidebar__link" data-view="articles">
+        <svg viewBox="0 0 24 24"><path d="M4 3h16a1 1 0 0 1 1 1v16a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1zm2 4v2h12V7H6zm0 4v2h12v-2H6zm0 4v2h8v-2H6z"/></svg>
+        სიახლეები
+      </button>
+      <button class="sidebar__link" data-view="home">
+        <svg viewBox="0 0 24 24"><path d="M12 3 2 12h3v8h6v-5h2v5h6v-8h3L12 3z"/></svg>
+        მთავარი გვერდი
+      </button>
+      <button class="sidebar__link" data-view="categories">
+        <svg viewBox="0 0 24 24"><path d="M3 5h8v6H3V5zm10 0h8v6h-8V5zM3 13h8v6H3v-6zm10 0h8v6h-8v-6z"/></svg>
+        კატეგორიები
+      </button>
+      <button class="sidebar__link" data-view="slider">
+        <svg viewBox="0 0 24 24"><path d="M7 5h10a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2zM2 8h2v8H2V8zm18 0h2v8h-2V8z"/></svg>
+        სლაიდერი
+      </button>
+    </nav>
+
+    <div class="sidebar__foot">
+      <a href="../index.html" target="_blank" class="sidebar__view">საიტის ნახვა ↗</a>
+      <button class="sidebar__logout" id="logoutBtn">გასვლა</button>
+    </div>
+  </aside>
+
+  <div class="sidebar__backdrop" id="sidebarBackdrop"></div>
+
+  <!-- ---------- main ---------- -->
+  <main class="main">
+
+    <header class="topbar">
+      <button class="topbar__burger" id="menuBtn" aria-label="მენიუ">
+        <span></span><span></span><span></span>
+      </button>
+      <h1 class="topbar__title" id="viewTitle">მთავარი</h1>
+      <button class="btn btn--sm" id="topAddBtn" hidden>+ დამატება</button>
+    </header>
+
+    <div class="content">
+
+      <!-- ===== dashboard ===== -->
+      <section class="view is-active" data-view="dashboard">
+        <div class="stats" id="stats"></div>
+
+        <div class="panel">
+          <div class="panel__head"><h2>ბოლოს დამატებული სიახლეები</h2></div>
+          <div id="recentList"></div>
+        </div>
+      </section>
+
+      <!-- ===== articles ===== -->
+      <section class="view" data-view="articles">
+        <div class="toolbar">
+          <input type="search" id="articleSearch" class="toolbar__search" placeholder="ძებნა სათაურით…" />
+          <select id="articleFilter" class="toolbar__select"></select>
+        </div>
+        <div class="panel" id="articleList"></div>
+      </section>
+
+      <!-- ===== latest news on the homepage ===== -->
+      <section class="view" data-view="home">
+        <p class="hint">აქ ჩამოთვლილია სიახლეები, რომლებიც მთავარ გვერდზე, „სპორტული სიახლეების“ ბლოკში ჩანს. ისრებით შეცვალეთ თანმიმდევრობა.</p>
+        <div class="panel" id="homeList"></div>
+      </section>
+
+      <!-- ===== categories ===== -->
+      <section class="view" data-view="categories">
+        <p class="hint">კატეგორია მაშინვე მუშაობს — სიახლის დამატებისას შეგიძლიათ აირჩიოთ და მისი გვერდიც იხსნება.
+          ზედა მენიუ სტატიკურია: ახალი კატეგორიის იქ გამოსაჩენად დაამატეთ ერთი ხაზი
+          <code>index.html</code>, <code>article.html</code> და <code>category.html</code> ფაილებში (იხ. SETUP.md).
+          წაშლისას სიახლეები რჩება, უბრალოდ კატეგორიის გარეშე.</p>
+        <div class="panel" id="categoryList"></div>
+      </section>
+
+      <!-- ===== slider ===== -->
+      <section class="view" data-view="slider">
+        <p class="hint">სლაიდები მთავარ გვერდზე ჩანს იმ თანმიმდევრობით, რომლითაც აქ არის დალაგებული.</p>
+        <div class="panel" id="slideList"></div>
+      </section>
+
+    </div>
+  </main>
+</div>
+
+
+<!-- ============================================================
+     FORM DRAWER  (article / category / slide)
+     ============================================================ -->
+<div class="drawer" id="drawer" hidden>
+  <div class="drawer__backdrop" data-close></div>
+
+  <form class="drawer__box" id="drawerForm">
+    <header class="drawer__head">
+      <h2 id="drawerTitle">რედაქტირება</h2>
+      <button type="button" class="drawer__close" data-close aria-label="დახურვა">&times;</button>
+    </header>
+
+    <div class="drawer__body" id="drawerBody"></div>
+
+    <footer class="drawer__foot">
+      <button type="button" class="btn btn--ghost" data-close>გაუქმება</button>
+      <button type="submit" class="btn" id="drawerSave">შენახვა</button>
+    </footer>
+  </form>
+</div>
+
+<div class="toast" id="toast" hidden></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="../js/config.js"></script>
+<script src="../js/api.js"></script>
+<script src="admin.js"></script>
+</body>
+</html>

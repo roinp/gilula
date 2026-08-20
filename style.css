@@ -38,6 +38,8 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
+[hidden] { display: none !important; }
+
 a { color: inherit; text-decoration: none; }
 ul { list-style: none; }
 img { max-width: 100%; display: block; }
@@ -394,6 +396,85 @@ img { max-width: 100%; display: block; }
   color: var(--muted);
 }
 
+.news__grid--3 { grid-template-columns: repeat(3, 1fr); }
+
+/* message shown while loading, or when there is nothing to show */
+.notice {
+  grid-column: 1 / -1;
+  padding: 40px 20px;
+  text-align: center;
+  color: var(--muted);
+  background: var(--surface);
+  border: 1px dashed var(--border);
+  border-radius: var(--radius);
+}
+
+/* ---------- 7b. Single article page ---------- */
+.container--narrow { max-width: 820px; }
+
+.article__head { margin-bottom: 24px; }
+.article__title {
+  margin-top: 6px;
+  font-size: clamp(26px, 4.5vw, 42px);
+  font-weight: 700;
+  line-height: 1.2;
+}
+.article__meta {
+  display: flex;
+  gap: 18px;
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border);
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.article__figure {
+  margin: 0 0 26px;
+  background: linear-gradient(135deg, #0d3d24, #0a0a0a);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+.article__image {
+  width: 100%;
+  max-height: 460px;
+  object-fit: cover;
+  object-position: center top;
+}
+.article__image--contain { object-fit: contain; padding: 20px; }
+
+.article__lead {
+  margin-bottom: 22px;
+  font-size: 18px;
+  font-weight: 500;
+  color: var(--text);
+}
+
+.article__content { color: #dcdcdc; font-size: 17px; }
+.article__content > * + * { margin-top: 16px; }
+.article__content h2 { font-size: 24px; color: var(--text); }
+.article__content h3 { font-size: 20px; color: var(--text); }
+.article__content a  { color: var(--green); text-decoration: underline; }
+.article__content ul,
+.article__content ol { padding-left: 22px; }
+.article__content li { list-style: inherit; margin-top: 6px; }
+.article__content ul { list-style: disc; }
+.article__content ol { list-style: decimal; }
+.article__content img { border-radius: var(--radius); margin-inline: auto; }
+.article__content blockquote {
+  padding: 12px 18px;
+  border-left: 3px solid var(--green);
+  background: var(--surface);
+  border-radius: 0 var(--radius) var(--radius) 0;
+  color: var(--muted);
+}
+
+.article__back { margin-top: 36px; }
+
+a.badge { transition: background .2s; }
+a.badge:hover { background: #fff; }
+
 /* ---------- 8. Contact ---------- */
 .contact { background: var(--black-soft); border-top: 1px solid var(--border); }
 
@@ -450,6 +531,8 @@ img { max-width: 100%; display: block; }
   flex-wrap: wrap;
 }
 .footer .logo__text { font-size: 17px; }
+.footer__admin { color: var(--green); }
+.footer__admin:hover { text-decoration: underline; }
 
 /* ============================================================
    10. Responsive
@@ -458,6 +541,7 @@ img { max-width: 100%; display: block; }
 /* laptop: 3 cards per row */
 @media (max-width: 1100px) {
   .news__grid,
+  .news__grid--3,
   .contact__grid { grid-template-columns: repeat(3, 1fr); }
 }
 
@@ -486,6 +570,7 @@ img { max-width: 100%; display: block; }
   .slide__number { font-size: 20px; min-width: 46px; }
 
   .news__grid,
+  .news__grid--3,
   .contact__grid { grid-template-columns: repeat(2, 1fr); }
 }
 
@@ -504,6 +589,7 @@ img { max-width: 100%; display: block; }
   }
 
   .news__grid,
+  .news__grid--3,
   .contact__grid { grid-template-columns: 1fr; }
 
   .footer__inner { justify-content: center; text-align: center; }

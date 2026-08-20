@@ -19,20 +19,22 @@
   <header class="header">
     <div class="container header__inner">
 
-      <a href="#" class="logo">
+      <a href="index.html" class="logo">
         <img src="logo.jpg" alt="Gilula Sport" class="logo__img" />
         <span class="logo__text">GILULA<span class="accent">SPORT</span></span>
       </a>
 
+      <!-- Static menu. To add an item: copy one <li> line and change the name.
+           The name must match the category name in the admin panel. -->
       <nav class="nav" id="nav">
         <ul class="nav__list">
-          <li><a href="#" class="nav__link is-active">ქართული სპორტი</a></li>
-          <li><a href="#" class="nav__link">ფეხბურთი</a></li>
-          <li><a href="#" class="nav__link">კალათბურთი</a></li>
-          <li><a href="#" class="nav__link">რაგბი</a></li>
-          <li><a href="#" class="nav__link">ვიდეო</a></li>
-          <li><a href="#" class="nav__link">MMA</a></li>
-          <li><a href="#" class="nav__link">სხვა</a></li>
+          <li><a href="category.html?name=ქართული სპორტი" class="nav__link">ქართული სპორტი</a></li>
+          <li><a href="category.html?name=ფეხბურთი" class="nav__link">ფეხბურთი</a></li>
+          <li><a href="category.html?name=კალათბურთი" class="nav__link">კალათბურთი</a></li>
+          <li><a href="category.html?name=რაგბი" class="nav__link">რაგბი</a></li>
+          <li><a href="category.html?name=ვიდეო" class="nav__link">ვიდეო</a></li>
+          <li><a href="category.html?name=MMA" class="nav__link">MMA</a></li>
+          <li><a href="category.html?name=სხვა" class="nav__link">სხვა</a></li>
         </ul>
       </nav>
 
@@ -45,94 +47,8 @@
 
   <!-- ============ SLIDER ============ -->
   <section class="slider" id="slider">
-    <div class="slider__track" id="sliderTrack">
-
-      <!-- slide 1 -->
-      <article class="slide slide--1">
-        <div class="container slide__inner">
-          <div class="slide__text">
-            <span class="badge">ფეხბურთი</span>
-            <h2 class="slide__title">ხვიჩა კვარაცხელია</h2>
-            <p class="slide__role">ეროვნული ნაკრები · ნახევარმცველი</p>
-            <p class="slide__desc">ქართული ფეხბურთის დღევანდელი სახე — მოთამაშე, რომელმაც საქართველო ევროპის ჩემპიონატზე გაიყვანა.</p>
-            <a href="#news" class="btn">სრულად ნახვა</a>
-          </div>
-          <div class="slide__visual">
-            <img src="images/kvaratskhelia.png" alt="ხვიჩა კვარაცხელია" class="slide__photo" />
-            <span class="slide__number">7</span>
-          </div>
-        </div>
-      </article>
-
-      <!-- slide 2 -->
-      <article class="slide slide--2">
-        <div class="container slide__inner">
-          <div class="slide__text">
-            <span class="badge">ფეხბურთი</span>
-            <h2 class="slide__title">გიორგი მამარდაშვილი</h2>
-            <p class="slide__role">ეროვნული ნაკრები · მეკარე</p>
-            <p class="slide__desc">„ევროპის კედელი“ — მეკარე, რომლის სახელიც ევროპის ტოპ კლუბებთან იხსენიება.</p>
-            <a href="#news" class="btn">სრულად ნახვა</a>
-          </div>
-          <div class="slide__visual">
-            <img src="images/mamardashvili.jpg" alt="გიორგი მამარდაშვილი" class="slide__photo" />
-            <span class="slide__number">1</span>
-          </div>
-        </div>
-      </article>
-
-      <!-- slide 3 -->
-      <article class="slide slide--3">
-        <div class="container slide__inner">
-          <div class="slide__text">
-            <span class="badge">ლეგენდა</span>
-            <h2 class="slide__title">კახა კალაძე</h2>
-            <p class="slide__role">ეროვნული ნაკრები · მცველი</p>
-            <p class="slide__desc">ორგზის ჩემპიონთა ლიგის მფლობელი და ქართული ფეხბურთის ერთ-ერთი უდიდესი სახელი.</p>
-            <a href="#news" class="btn">სრულად ნახვა</a>
-          </div>
-          <div class="slide__visual">
-            <img src="images/kaladze.png" alt="კახა კალაძე" class="slide__photo" />
-            <span class="slide__number">4</span>
-          </div>
-        </div>
-      </article>
-
-      <!-- slide 4 -->
-      <article class="slide slide--4">
-        <div class="container slide__inner">
-          <div class="slide__text">
-            <span class="badge">ლეგენდა</span>
-            <h2 class="slide__title">გიორგი კინკლაძე</h2>
-            <p class="slide__role">ეროვნული ნაკრები · ნახევარმცველი</p>
-            <p class="slide__desc">ტექნიკის ოსტატი, რომელიც ინგლისურ ფეხბურთში დღემდე კულტურულ ფიგურად რჩება.</p>
-            <a href="#news" class="btn">სრულად ნახვა</a>
-          </div>
-          <div class="slide__visual">
-            <img src="images/kinkladze.jpg" alt="გიორგი კინკლაძე" class="slide__photo" />
-            <span class="slide__number">10</span>
-          </div>
-        </div>
-      </article>
-
-      <!-- slide 5 -->
-      <article class="slide slide--5">
-        <div class="container slide__inner">
-          <div class="slide__text">
-            <span class="badge">ლეგენდა</span>
-            <h2 class="slide__title">შოთა არველაძე</h2>
-            <p class="slide__role">ეროვნული ნაკრები · თავდამსხმელი</p>
-            <p class="slide__desc">ეროვნული ნაკრების ისტორიის ერთ-ერთი საუკეთესო ბომბარდირი და მწვრთნელი.</p>
-            <a href="#news" class="btn">სრულად ნახვა</a>
-          </div>
-          <div class="slide__visual">
-            <img src="images/arveladze.png" alt="შოთა არველაძე" class="slide__photo" />
-            <span class="slide__number">9</span>
-          </div>
-        </div>
-      </article>
-
-    </div>
+    <!-- slides are loaded from the database -->
+    <div class="slider__track" id="sliderTrack"></div>
 
     <button class="slider__arrow slider__arrow--prev" id="prevBtn" aria-label="წინა">&#10094;</button>
     <button class="slider__arrow slider__arrow--next" id="nextBtn" aria-label="შემდეგი">&#10095;</button>
@@ -148,12 +64,8 @@
         <p class="section__subtitle">ყველაზე მნიშვნელოვანი ამბები ქართული და მსოფლიო სპორტიდან</p>
       </div>
 
-      <!-- 12 articles are rendered here by script.js -->
+      <!-- articles marked "Latest News" in the admin panel are rendered here -->
       <div class="news__grid" id="newsGrid"></div>
-
-      <div class="section__foot">
-        <a href="#" class="btn btn--outline">ყველას ნახვა</a>
-      </div>
 
     </div>
   </section>
@@ -216,15 +128,19 @@
   <!-- ============ FOOTER ============ -->
   <footer class="footer">
     <div class="container footer__inner">
-      <a href="#" class="logo">
+      <a href="index.html" class="logo">
         <img src="logo.jpg" alt="Gilula Sport" class="logo__img" />
         <span class="logo__text">GILULA<span class="accent">SPORT</span></span>
       </a>
       <p>&copy; <span id="year"></span> GILULA SPORT — ყველა უფლება დაცულია.</p>
-      <p class="footer__note">სპორტული სიახლეები ყოველდღე</p>
+      <p class="footer__note">სპორტული სიახლეები ყოველდღე · <a href="admin/" class="footer__admin">ადმინი</a></p>
     </div>
   </footer>
 
-  <script src="script.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/config.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/common.js"></script>
+  <script src="js/home.js"></script>
 </body>
 </html>

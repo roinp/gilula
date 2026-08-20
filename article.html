@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="ka">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>სიახლე — GILULA SPORT</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@400;500;700&family=Noto+Sans+Georgian:wght@400;500;700;800&display=swap" rel="stylesheet" />
+
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- ============ HEADER / NAVBAR ============ -->
+  <header class="header">
+    <div class="container header__inner">
+
+      <a href="index.html" class="logo">
+        <img src="logo.jpg" alt="Gilula Sport" class="logo__img" />
+        <span class="logo__text">GILULA<span class="accent">SPORT</span></span>
+      </a>
+
+      <!-- Static menu — keep it identical on every page. -->
+      <nav class="nav" id="nav">
+        <ul class="nav__list">
+          <li><a href="category.html?name=ქართული სპორტი" class="nav__link">ქართული სპორტი</a></li>
+          <li><a href="category.html?name=ფეხბურთი" class="nav__link">ფეხბურთი</a></li>
+          <li><a href="category.html?name=კალათბურთი" class="nav__link">კალათბურთი</a></li>
+          <li><a href="category.html?name=რაგბი" class="nav__link">რაგბი</a></li>
+          <li><a href="category.html?name=ვიდეო" class="nav__link">ვიდეო</a></li>
+          <li><a href="category.html?name=MMA" class="nav__link">MMA</a></li>
+          <li><a href="category.html?name=სხვა" class="nav__link">სხვა</a></li>
+        </ul>
+      </nav>
+
+      <button class="burger" id="burger" aria-label="მენიუ" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+
+    </div>
+  </header>
+
+  <!-- ============ ARTICLE ============ -->
+  <main class="section">
+    <div class="container container--narrow">
+      <article class="article" id="articleBox">
+        <p class="notice">იტვირთება…</p>
+      </article>
+    </div>
+  </main>
+
+  <!-- ============ RELATED ============ -->
+  <section class="news section" id="relatedBox" hidden>
+    <div class="container">
+      <div class="section__head">
+        <h2 class="section__title">მსგავსი <span class="accent">სიახლეები</span></h2>
+      </div>
+      <div class="news__grid news__grid--3" id="relatedGrid"></div>
+    </div>
+  </section>
+
+  <!-- ============ FOOTER ============ -->
+  <footer class="footer">
+    <div class="container footer__inner">
+      <a href="index.html" class="logo">
+        <img src="logo.jpg" alt="Gilula Sport" class="logo__img" />
+        <span class="logo__text">GILULA<span class="accent">SPORT</span></span>
+      </a>
+      <p>&copy; <span id="year"></span> GILULA SPORT — ყველა უფლება დაცულია.</p>
+      <p class="footer__note">სპორტული სიახლეები ყოველდღე · <a href="admin/" class="footer__admin">ადმინი</a></p>
+    </div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/config.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/common.js"></script>
+  <script src="js/article.js"></script>
+</body>
+</html>
