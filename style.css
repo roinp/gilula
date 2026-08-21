@@ -120,6 +120,52 @@ img { max-width: 100%; display: block; }
 .nav__link:hover { color: var(--text); background: var(--surface); }
 .nav__link.is-active { color: var(--green); }
 
+/* language switcher (Georgian / English flags) */
+.header__right { display: flex; align-items: center; gap: 10px; }
+
+.lang { display: flex; gap: 6px; }
+
+.lang__btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 32px;
+  padding: 0;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  cursor: pointer;
+  opacity: .5;
+  transition: opacity .2s, border-color .2s, transform .2s;
+}
+.lang__btn:hover { opacity: 1; transform: translateY(-1px); }
+.lang__btn.is-active { opacity: 1; border-color: var(--green); }
+.lang__btn svg { width: 24px; height: 16px; border-radius: 2px; }
+
+/* Google Translate does the actual translating, but we drive it from the
+   flag buttons above — so its own toolbar and tooltips stay hidden. */
+#google_translate_element { display: none; }
+.goog-te-banner-frame,
+.goog-te-gadget,
+#goog-gt-tt,
+iframe.skiptranslate { display: none !important; }
+body { top: 0 !important; }
+.goog-text-highlight { background: none !important; box-shadow: none !important; }
+
+/* On English the menu and the section headings go all-caps.
+   Scoped to .lang-en on purpose: Georgian has no capitals, and
+   text-transform would turn Mkhedruli into Mtavruli. */
+.lang-en .nav__link {
+  text-transform: uppercase;
+  letter-spacing: .4px;
+  font-size: 14px;
+}
+.lang-en .section__title {
+  text-transform: uppercase;
+  letter-spacing: .5px;
+}
+
 /* burger (mobile only) */
 .burger {
   display: none;
