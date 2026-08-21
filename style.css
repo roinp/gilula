@@ -4,25 +4,99 @@
    ============================================================ */
 
 /* ---------- 1. Variables ---------- */
+/* Dark is the default theme. The light theme (below) only re-declares the
+   colours — every rule in this file reads them through var(), so nothing
+   else has to be written twice.
+
+   js/theme.js puts data-theme="light" on <html> and remembers the choice. */
 :root {
-  --black:        #0a0a0a;
+  color-scheme: dark;
+
+  --black:        #0a0a0a;   /* page background */
   --black-soft:   #121212;
   --surface:      #171717;
   --surface-2:    #1f1f1f;
   --border:       #2a2a2a;
 
-  --green:        #00e05a;
+  --green:        #00e05a;   /* the vivid brand green — badges, buttons, borders */
   --green-dark:   #00a844;
+  --green-text:   #00e05a;   /* green used as text on the page background */
+  --on-green:     #04180c;   /* text printed on top of the vivid green */
   --yellow:       #ffd21e;
 
   --text:         #f2f2f2;
+  --text-strong:  #ffffff;
+  --content:      #dcdcdc;   /* article body text */
   --muted:        #9b9b9b;
+
+  --header-bg:    rgba(10, 10, 10, .95);
+  --photo-bg:     linear-gradient(135deg, #0d3d24, #0a0a0a);
+  --thumb-veil:   linear-gradient(to top, rgba(10, 10, 10, .9) 0%, rgba(10, 10, 10, .1) 55%);
+  --arrow-bg:     rgba(0, 0, 0, .5);
+  --dot:          #444;
+
+  --shadow-photo: 0 20px 50px rgba(0, 0, 0, .6), 0 0 0 4px rgba(0, 224, 90, .12);
+  --shadow-badge: 0 8px 20px rgba(0, 0, 0, .5);
+  --slider-glow:  0 0 0 6px rgba(255, 210, 30, .08), 0 0 45px rgba(255, 210, 30, .18);
+
+  --btn-hover-bg:   #ffffff;
+  --btn-hover-text: #04180c;
+
+  --slide-1: radial-gradient(900px 500px at 80% 40%, #0c4a29 0%, #0a0a0a 65%);
+  --slide-2: radial-gradient(900px 500px at 80% 40%, #0a4033 0%, #0a0a0a 65%);
+  --slide-3: radial-gradient(900px 500px at 80% 40%, #14512b 0%, #0a0a0a 65%);
+  --slide-4: radial-gradient(900px 500px at 80% 40%, #073d24 0%, #0a0a0a 65%);
+  --slide-5: radial-gradient(900px 500px at 80% 40%, #10462c 0%, #0a0a0a 65%);
 
   --radius:       12px;
   --container:    1240px;
   --header-h:     72px;
 
   --font: "Ubuntu", "Noto Sans Georgian", "Segoe UI", Arial, sans-serif;
+}
+
+/* ---------- 1b. Light theme ---------- */
+/* The green stays the same on badges and buttons; where green is used as
+   plain text it darkens (--green-text), otherwise it would be unreadable
+   on a white background. */
+:root[data-theme="light"] {
+  color-scheme: light;
+
+  --black:        #f4f5f7;
+  --black-soft:   #eaecf0;
+  --surface:      #ffffff;
+  --surface-2:    #f1f3f6;
+  --border:       #dcdfe4;
+
+  --green:        #00c853;
+  --green-dark:   #00a844;
+  --green-text:   #04803c;
+  --on-green:     #04180c;
+  --yellow:       #e6a900;
+
+  --text:         #14181d;
+  --text-strong:  #000000;
+  --content:      #333a42;
+  --muted:        #5f6975;
+
+  --header-bg:    rgba(255, 255, 255, .92);
+  --photo-bg:     linear-gradient(135deg, #dcf5e6, #eef0f3);
+  --thumb-veil:   linear-gradient(to top, rgba(10, 10, 10, .78) 0%, rgba(10, 10, 10, 0) 60%);
+  --arrow-bg:     rgba(255, 255, 255, .85);
+  --dot:          #c4cad2;
+
+  --shadow-photo: 0 18px 40px rgba(20, 30, 45, .16), 0 0 0 4px rgba(0, 200, 83, .16);
+  --shadow-badge: 0 8px 20px rgba(20, 30, 45, .28);
+  --slider-glow:  0 0 0 6px rgba(230, 169, 0, .1), 0 14px 40px rgba(20, 30, 45, .12);
+
+  --btn-hover-bg:   #14181d;
+  --btn-hover-text: #ffffff;
+
+  --slide-1: radial-gradient(900px 500px at 80% 40%, #d7f4e2 0%, #ffffff 65%);
+  --slide-2: radial-gradient(900px 500px at 80% 40%, #d3f1ea 0%, #ffffff 65%);
+  --slide-3: radial-gradient(900px 500px at 80% 40%, #ddf5df 0%, #ffffff 65%);
+  --slide-4: radial-gradient(900px 500px at 80% 40%, #d2f2e0 0%, #ffffff 65%);
+  --slide-5: radial-gradient(900px 500px at 80% 40%, #d9f3e3 0%, #ffffff 65%);
 }
 
 /* ---------- 2. Base ---------- */
@@ -36,6 +110,7 @@ body {
   color: var(--text);
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
+  transition: background .25s, color .25s;
 }
 
 [hidden] { display: none !important; }
@@ -51,35 +126,39 @@ img { max-width: 100%; display: block; }
   padding: 0 20px;
 }
 
-.accent { color: var(--green); }
+.accent { color: var(--green-text); }
 
 /* ---------- 3. Buttons ---------- */
 .btn {
   display: inline-block;
   padding: 12px 28px;
   background: var(--green);
-  color: #04180c;
+  color: var(--on-green);
   font-weight: 700;
   font-size: 15px;
   border-radius: 999px;
-  transition: background .25s, transform .25s;
+  transition: background .25s, color .25s, transform .25s;
 }
-.btn:hover { background: #fff; transform: translateY(-2px); }
+.btn:hover {
+  background: var(--btn-hover-bg);
+  color: var(--btn-hover-text);
+  transform: translateY(-2px);
+}
 
 .btn--outline {
   background: transparent;
-  color: var(--green);
+  color: var(--green-text);
   border: 2px solid var(--green);
   padding: 12px 40px;
 }
-.btn--outline:hover { background: var(--green); color: #04180c; }
+.btn--outline:hover { background: var(--green); color: var(--on-green); }
 
 /* ---------- 4. Header / Navbar ---------- */
 .header {
   position: sticky;
   top: 0;
   z-index: 50;
-  background: rgba(10, 10, 10, .95);
+  background: var(--header-bg);
   backdrop-filter: blur(8px);
   border-bottom: 1px solid var(--border);
 }
@@ -118,7 +197,7 @@ img { max-width: 100%; display: block; }
   transition: color .2s, background .2s;
 }
 .nav__link:hover { color: var(--text); background: var(--surface); }
-.nav__link.is-active { color: var(--green); }
+.nav__link.is-active { color: var(--green-text); }
 
 /* language switcher (Georgian / English flags) */
 .header__right { display: flex; align-items: center; gap: 10px; }
@@ -142,6 +221,31 @@ img { max-width: 100%; display: block; }
 .lang__btn:hover { opacity: 1; transform: translateY(-1px); }
 .lang__btn.is-active { opacity: 1; border-color: var(--green); }
 .lang__btn svg { width: 24px; height: 16px; border-radius: 2px; }
+
+/* dark / light switch — see js/theme.js */
+.theme {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 32px;
+  padding: 0;
+  color: var(--green-text);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: border-color .2s, transform .2s, color .2s;
+}
+.theme:hover { border-color: var(--green); transform: translateY(-1px); }
+.theme svg { width: 18px; height: 18px; fill: currentColor; }
+
+/* the moon offers the dark theme, the sun the light one —
+   so each page shows the icon of the theme you would switch to */
+.theme__sun  { display: block; }
+.theme__moon { display: none; }
+:root[data-theme="light"] .theme__sun  { display: none; }
+:root[data-theme="light"] .theme__moon { display: block; }
 
 /* Google Translate does the actual translating, but we drive it from the
    flag buttons above — so its own toolbar and tooltips stay hidden. */
@@ -184,7 +288,7 @@ body { top: 0 !important; }
   width: 20px;
   height: 2px;
   margin: 0 auto;
-  background: var(--green);
+  background: var(--green-text);
   transition: transform .25s, opacity .25s;
 }
 .burger.is-open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
@@ -202,8 +306,7 @@ body { top: 0 !important; }
   margin: 24px auto;
   border: 2px solid var(--yellow);
   border-radius: 18px;
-  box-shadow: 0 0 0 6px rgba(255, 210, 30, .08),
-              0 0 45px rgba(255, 210, 30, .18);
+  box-shadow: var(--slider-glow);
 }
 
 .slider__track {
@@ -219,12 +322,12 @@ body { top: 0 !important; }
   position: relative;
 }
 
-/* every slide gets its own dark-green gradient */
-.slide--1 { background: radial-gradient(900px 500px at 80% 40%, #0c4a29 0%, #0a0a0a 65%); }
-.slide--2 { background: radial-gradient(900px 500px at 80% 40%, #0a4033 0%, #0a0a0a 65%); }
-.slide--3 { background: radial-gradient(900px 500px at 80% 40%, #14512b 0%, #0a0a0a 65%); }
-.slide--4 { background: radial-gradient(900px 500px at 80% 40%, #073d24 0%, #0a0a0a 65%); }
-.slide--5 { background: radial-gradient(900px 500px at 80% 40%, #10462c 0%, #0a0a0a 65%); }
+/* every slide gets its own green gradient (dark or pale, per theme) */
+.slide--1 { background: var(--slide-1); }
+.slide--2 { background: var(--slide-2); }
+.slide--3 { background: var(--slide-3); }
+.slide--4 { background: var(--slide-4); }
+.slide--5 { background: var(--slide-5); }
 
 .slide__inner {
   display: grid;
@@ -239,7 +342,7 @@ body { top: 0 !important; }
   padding: 5px 14px;
   margin-bottom: 16px;
   background: var(--green);
-  color: #04180c;
+  color: var(--on-green);
   font-size: 12px;
   font-weight: 700;
   letter-spacing: 1px;
@@ -260,7 +363,7 @@ body { top: 0 !important; }
 }
 .slide__role {
   margin-top: 10px;
-  color: var(--green);
+  color: var(--green-text);
   font-weight: 500;
   font-size: 15px;
 }
@@ -292,8 +395,8 @@ body { top: 0 !important; }
   object-position: center top;
   border-radius: var(--radius);
   border: 1px solid var(--border);
-  background: linear-gradient(135deg, #0d3d24, #0a0a0a);
-  box-shadow: 0 20px 50px rgba(0, 0, 0, .6), 0 0 0 4px rgba(0, 224, 90, .12);
+  background: var(--photo-bg);
+  box-shadow: var(--shadow-photo);
 }
 .slide__photo--contain { object-fit: contain; padding: 16px; }
 
@@ -310,13 +413,13 @@ body { top: 0 !important; }
   min-width: 58px;
   padding: 6px 12px;
   background: var(--green);
-  color: #04180c;
+  color: var(--on-green);
   font-size: 26px;
   font-weight: 700;
   line-height: 1.2;
   text-align: center;
   border-radius: 10px;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, .5);
+  box-shadow: var(--shadow-badge);
 }
 .slide__visual.no-photo .slide__number { position: static; }
 
@@ -330,15 +433,15 @@ body { top: 0 !important; }
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(0, 0, 0, .5);
+  background: var(--arrow-bg);
   border: 1px solid var(--border);
-  color: var(--green);
+  color: var(--green-text);
   font-size: 18px;
   border-radius: 50%;
   cursor: pointer;
-  transition: background .2s;
+  transition: background .2s, color .2s;
 }
-.slider__arrow:hover { background: var(--green); color: #04180c; }
+.slider__arrow:hover { background: var(--green); color: var(--on-green); }
 .slider__arrow--prev { left: 16px; }
 .slider__arrow--next { right: 16px; }
 
@@ -355,7 +458,7 @@ body { top: 0 !important; }
 .dot {
   width: 10px;
   height: 10px;
-  background: #444;
+  background: var(--dot);
   border: none;
   border-radius: 50%;
   cursor: pointer;
@@ -396,7 +499,7 @@ body { top: 0 !important; }
   align-items: flex-end;
   padding: 12px;
   overflow: hidden;
-  background: linear-gradient(135deg, #0d3d24, #0a0a0a);
+  background: var(--photo-bg);
 }
 
 /* the article photo */
@@ -412,12 +515,13 @@ body { top: 0 !important; }
 .card__img--contain { object-fit: contain; padding: 18px; }
 .card:hover .card__img { transform: scale(1.06); }
 
-/* dark gradient so the badge stays readable on top of the photo */
+/* dark gradient so the badge stays readable on top of the photo
+   (it stays dark in the light theme too — it sits over a photo) */
 .card__thumb::after {
   content: "";
   position: absolute;
   inset: 0;
-  background: linear-gradient(to top, rgba(10, 10, 10, .9) 0%, rgba(10, 10, 10, .1) 55%);
+  background: var(--thumb-veil);
 }
 
 .card__badge {
@@ -425,7 +529,7 @@ body { top: 0 !important; }
   z-index: 1;
   padding: 4px 12px;
   background: var(--green);
-  color: #04180c;
+  color: var(--on-green);
   font-size: 11px;
   font-weight: 700;
   border-radius: 999px;
@@ -438,7 +542,7 @@ body { top: 0 !important; }
   line-height: 1.4;
   transition: color .2s;
 }
-.card:hover .card__title { color: var(--green); }
+.card:hover .card__title { color: var(--green-text); }
 .card__excerpt {
   margin-top: 8px;
   font-size: 14px;
@@ -451,7 +555,7 @@ body { top: 0 !important; }
   font-size: 12px;
   color: var(--muted);
 }
-.card__author span { color: white; font-weight: 500; }
+.card__author span { color: var(--text-strong); font-weight: 500; }
 
 .card__meta {
   margin-top: 14px;
@@ -498,7 +602,7 @@ body { top: 0 !important; }
 
 .article__figure {
   margin: 0 0 26px;
-  background: linear-gradient(135deg, #0d3d24, #0a0a0a);
+  background: var(--photo-bg);
   border: 1px solid var(--border);
   border-radius: var(--radius);
   overflow: hidden;
@@ -525,7 +629,7 @@ body { top: 0 !important; }
   font-size: 15px;
 }
 .article__author-label { color: var(--muted); }
-.article__author-name  { color: var(--green); font-weight: 700; }
+.article__author-name  { color: var(--green-text); font-weight: 700; }
 
 .article__lead {
   margin-bottom: 22px;
@@ -533,14 +637,14 @@ body { top: 0 !important; }
   font-weight: 500;
   color: var(--text);
   padding-bottom: 12px;
-  border-bottom: 1px solid rgb(250, 221, 59);
+  border-bottom: 1px solid var(--yellow);
 }
 
-.article__content { color: #dcdcdc; font-size: 17px; }
+.article__content { color: var(--content); font-size: 17px; }
 .article__content > * + * { margin-top: 16px; }
 .article__content h2 { font-size: 24px; color: var(--text); }
 .article__content h3 { font-size: 20px; color: var(--text); }
-.article__content a  { color: var(--green); text-decoration: underline; }
+.article__content a  { color: var(--green-text); text-decoration: underline; }
 .article__content ul,
 .article__content ol { padding-left: 22px; }
 .article__content li { list-style: inherit; margin-top: 6px; }
@@ -557,8 +661,8 @@ body { top: 0 !important; }
 
 .article__back { margin-top: 36px; }
 
-a.badge { transition: background .2s; }
-a.badge:hover { background: #fff; }
+a.badge { transition: background .2s, color .2s; }
+a.badge:hover { background: var(--btn-hover-bg); color: var(--btn-hover-text); }
 
 /* ---------- 8. Contact ---------- */
 .contact { background: var(--black-soft); border-top: 1px solid var(--border); }
@@ -593,9 +697,9 @@ a.badge:hover { background: #fff; }
   border-radius: 50%;
   transition: background .25s;
 }
-.contact__icon svg { width: 28px; height: 28px; fill: var(--green); transition: fill .25s; }
+.contact__icon svg { width: 28px; height: 28px; fill: var(--green-text); transition: fill .25s; }
 .contact__card:hover .contact__icon { background: var(--green); }
-.contact__card:hover .contact__icon svg { fill: #04180c; }
+.contact__card:hover .contact__icon svg { fill: var(--on-green); }
 
 .contact__name { display: block; font-weight: 700; font-size: 17px; }
 .contact__value { display: block; margin-top: 4px; font-size: 14px; color: var(--muted); }
@@ -616,7 +720,7 @@ a.badge:hover { background: #fff; }
   flex-wrap: wrap;
 }
 .footer .logo__text { font-size: 17px; }
-.footer__admin { color: var(--green); }
+.footer__admin { color: var(--green-text); }
 .footer__admin:hover { text-decoration: underline; }
 
 /* ============================================================
@@ -663,6 +767,15 @@ a.badge:hover { background: #fff; }
 @media (max-width: 560px) {
   .section { padding: 50px 0; }
   .logo__text { font-size: 17px; }
+
+  /* theme + two flags + burger must still fit next to the logo */
+  .header__right { gap: 6px; }
+  .lang { gap: 4px; }
+  .theme,
+  .lang__btn { width: 34px; height: 30px; }
+  .lang__btn svg { width: 20px; height: 14px; }
+  .theme svg { width: 16px; height: 16px; }
+
   .slide { min-height: 420px; }
   .slider__arrow { display: none; }
   .slide__inner { padding: 45px 20px 70px; } /* arrows are hidden here, so no extra padding */
