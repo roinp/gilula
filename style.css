@@ -399,6 +399,14 @@ img { max-width: 100%; display: block; }
   color: var(--muted);
   flex: 1;
 }
+/* "ავტორი: სახელი გვარი" on the news card */
+.card__author {
+  margin-top: 10px;
+  font-size: 12px;
+  color: var(--muted);
+}
+.card__author span { color: white; font-weight: 500; }
+
 .card__meta {
   margin-top: 14px;
   padding-top: 12px;

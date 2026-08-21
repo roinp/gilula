@@ -57,6 +57,8 @@ function articleCard(article) {
       <div class="card__body">
         <h3 class="card__title">${esc(article.title)}</h3>
         <p class="card__excerpt">${esc(article.excerpt)}</p>
+        ${article.author ? `
+          <p class="card__author">ავტორი:  <span>  ${esc(article.author)} </span></p>` : ""}
         <div class="card__meta">
           <span>${formatDate(article.published_at)}</span>
           <span>${esc(article.read_time)} საკითხავი</span>
