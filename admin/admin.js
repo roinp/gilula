@@ -129,18 +129,26 @@ $("logoutBtn").addEventListener("click", async () => {
    3. Loading & navigation
    ------------------------------------------------------------ */
 
-const state = { categories: [], articles: [], view: "dashboard" };
+const state = { categories: [], articles: [], hasAuthor: true, view: "dashboard" };
+
+/** Shown while the "author" column is still missing from the database. */
+const AUTHOR_MISSING_HINT = `
+  <p class="hint hint--warn">ავტორის ველი ჯერ არ არის ბაზაში.
+    გაუშვით <code>supabase/002-author-and-slider.sql</code>
+    (Supabase → SQL Editor). მანამდე დანარჩენი ყველაფერი ჩვეულებრივ მუშაობს.</p>`;
 
 /** How many of the homepage articles also appear in the slider. */
 const SLIDER_COUNT = 7;
 
 async function loadAll() {
-  const [categories, articles] = await Promise.all([
+  const [categories, articles, hasAuthor] = await Promise.all([
     API.getCategories(),
-    API.getArticles({ includeHidden: true })
+    API.getArticles({ includeHidden: true }),
+    API.hasColumn("articles", "author")
   ]);
   state.categories = categories;
   state.articles   = articles;
+  state.hasAuthor  = hasAuthor;   // false until 002-author-and-slider.sql is run
 }
 
 async function start() {
@@ -283,7 +291,7 @@ function renderArticles() {
             <div class="row__title">${esc(article.title)}</div>
             <div class="row__sub">
               <span class="tag">${esc(article.categories ? article.categories.name : "კატეგორიის გარეშე")}</span>
-              <span>${esc(article.author || "ავტორის გარეშე")}</span>
+              ${state.hasAuthor ? `<span>${esc(article.author || "ავტორის გარეშე")}</span>` : ""}
               <span>${formatDate(article.published_at)}</span>
             </div>
           </div>
@@ -342,7 +350,7 @@ function renderHome() {
               ${index < SLIDER_COUNT ? `<span class="tag tag--green">სლაიდერში</span>` : ""}
               <span class="tag ${article.published ? "tag--muted" : "tag--yellow"}">
                 ${article.published ? "ჩანს საიტზე" : "დამალულია — არ ჩანს"}</span>
-              <span>${esc(article.author || "ავტორის გარეშე")}</span>
+              ${state.hasAuthor ? `<span>${esc(article.author || "ავტორის გარეშე")}</span>` : ""}
             </div>
           </div>
 
@@ -596,11 +604,12 @@ function openArticleForm(id) {
       <input type="text" name="title" required value="${esc(article.title || "")}" />
     </label>
 
-    <label class="field">
-      <span class="field__label">ავტორი</span>
-      <input type="text" name="author" value="${esc(article.author || "")}"
-             placeholder="სახელი გვარი" />
-    </label>
+    ${state.hasAuthor ? `
+      <label class="field">
+        <span class="field__label">ავტორი</span>
+        <input type="text" name="author" value="${esc(article.author || "")}"
+               placeholder="სახელი გვარი" />
+      </label>` : AUTHOR_MISSING_HINT}
 
     <div class="field-row">
       <label class="field">
@@ -657,7 +666,6 @@ function openArticleForm(id) {
   openDrawer(isNew ? "ახალი სიახლე" : "სიახლის რედაქტირება", body, (data, root) => {
     const values = {
       title:        data.get("title").trim(),
-      author:       data.get("author").trim(),
       excerpt:      data.get("excerpt").trim(),
       content:      root.querySelector(".editor__area").innerHTML.trim(),
       image_url:    data.get("image_url").trim(),
@@ -668,6 +676,9 @@ function openArticleForm(id) {
       published:    data.get("published") === "on",
       show_on_home: data.get("show_on_home") === "on"
     };
+
+    // only send the column if the database already has it
+    if (state.hasAuthor) values.author = data.get("author").trim();
 
     if (isNew) {
       // new homepage articles go to the top of "Latest News"

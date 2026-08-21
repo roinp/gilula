@@ -97,6 +97,13 @@
       return run(sb.from("articles").delete().eq("id", id));
     },
 
+    /** True if a column exists. Lets the admin keep working while a
+        database update is still pending. */
+    async hasColumn(table, column) {
+      const { error } = await sb.from(table).select(column).limit(1);
+      return !error;
+    },
+
     /* ---------- image upload ---------- */
 
     /** Uploads a file to the public "media" bucket and returns its URL. */

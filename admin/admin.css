@@ -127,6 +127,12 @@ svg  { width: 20px; height: 20px; fill: currentColor; flex: none; }
   border-radius: 0 var(--radius) var(--radius) 0;
 }
 
+.hint--warn {
+  color: var(--text);
+  border-left-color: var(--yellow);
+  background: rgba(255, 210, 30, .07);
+}
+
 .hint code {
   padding: 1px 6px;
   font-size: 12px;
