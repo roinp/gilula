@@ -129,7 +129,30 @@ $("logoutBtn").addEventListener("click", async () => {
    3. Loading & navigation
    ------------------------------------------------------------ */
 
-const state = { categories: [], articles: [], hasAuthor: true, view: "dashboard" };
+const state = {
+  categories: [],
+  articles: [],
+  hasAuthor: true,
+  view: "dashboard",
+
+  /* who is signed in — filled by loadAll() */
+  me:       null,      // { id, full_name, role } or null
+  userId:   null,
+  role:     "admin",   // "admin" | "author"
+  hasRoles: false      // false until supabase/003-roles.sql has been run
+};
+
+/** Views only the admin may open. */
+const ADMIN_ONLY_VIEWS = ["home"];
+
+const isAdmin = () => state.role === "admin";
+
+/** An author may only change what they wrote themselves. */
+const canEdit = article =>
+  isAdmin() || (state.hasRoles && !!article.author_id && article.author_id === state.userId);
+
+/** The signed-in author's own articles. */
+const myArticles = () => state.articles.filter(canEdit);
 
 /** Shown while the "author" column is still missing from the database. */
 const AUTHOR_MISSING_HINT = `
@@ -141,14 +164,39 @@ const AUTHOR_MISSING_HINT = `
 const SLIDER_COUNT = 7;
 
 async function loadAll() {
-  const [categories, articles, hasAuthor] = await Promise.all([
+  const [categories, articles, hasAuthor, profile] = await Promise.all([
     API.getCategories(),
     API.getArticles({ includeHidden: true }),
-    API.hasColumn("articles", "author")
+    API.hasColumn("articles", "author"),
+    API.getProfile()
   ]);
   state.categories = categories;
   state.articles   = articles;
   state.hasAuthor  = hasAuthor;   // false until 002-author-and-slider.sql is run
+
+  // no profiles table yet → everyone keeps the full rights they had before
+  state.hasRoles = !!profile;
+  state.me       = profile;
+  state.userId   = profile ? profile.id : null;
+  state.role     = profile ? profile.role : "admin";
+}
+
+/** Hides everything the signed-in user is not allowed to open. */
+function applyRole() {
+  const admin = isAdmin();
+
+  document.querySelectorAll(".sidebar__link").forEach(link => {
+    link.hidden = !admin && ADMIN_ONLY_VIEWS.includes(link.dataset.view);
+  });
+
+  if (!admin && ADMIN_ONLY_VIEWS.includes(state.view)) state.view = "dashboard";
+
+  const badge = $("userBadge");
+  const name  = (state.me && state.me.full_name) || "";
+  badge.hidden = !state.hasRoles;
+  badge.innerHTML = `
+    <span class="sidebar__user-name">${esc(name || "მომხმარებელი")}</span>
+    <span class="tag ${admin ? "tag--green" : "tag--muted"}">${admin ? "ადმინი" : "ავტორი"}</span>`;
 }
 
 async function start() {
@@ -156,6 +204,7 @@ async function start() {
   $("app").hidden = false;
   try {
     await loadAll();
+    applyRole();
     switchView(state.view);
   } catch (error) {
     toast("მონაცემები ვერ ჩაიტვირთა: " + error.message, true);
@@ -175,6 +224,7 @@ const ADD_LABELS = {
 };
 
 function switchView(view) {
+  if (!isAdmin() && ADMIN_ONLY_VIEWS.includes(view)) view = "dashboard";
   state.view = view;
 
   document.querySelectorAll(".sidebar__link")
@@ -221,22 +271,34 @@ function render() {
    ------------------------------------------------------------ */
 
 function renderDashboard() {
-  const published = state.articles.filter(a => a.published).length;
+  /* an author only counts — and only sees — their own articles */
+  const mine      = isAdmin() ? state.articles : myArticles();
+  const published = mine.filter(a => a.published).length;
 
-  $("stats").innerHTML = [
-    ["სულ სიახლე",        state.articles.length],
-    ["გამოქვეყნებული",    published],
-    ["დამალული",          state.articles.length - published],
-    ["მთავარ გვერდზე",    state.articles.filter(a => a.show_on_home && a.published).length],
-    ["სლაიდერში",         Math.min(SLIDER_COUNT, homeArticles().filter(a => a.published).length)],
-    ["კატეგორია",         state.categories.length]
-  ].map(([label, value]) => `
+  const stats = isAdmin()
+    ? [
+        ["სულ სიახლე",     state.articles.length],
+        ["გამოქვეყნებული", published],
+        ["დამალული",       state.articles.length - published],
+        ["მთავარ გვერდზე", state.articles.filter(a => a.show_on_home && a.published).length],
+        ["სლაიდერში",      Math.min(SLIDER_COUNT, homeArticles().filter(a => a.published).length)],
+        ["კატეგორია",      state.categories.length]
+      ]
+    : [
+        ["ჩემი სიახლე",    mine.length],
+        ["გამოქვეყნებული", published],
+        ["დამალული",       mine.length - published],
+        ["სულ საიტზე",     state.articles.length],
+        ["კატეგორია",      state.categories.length]
+      ];
+
+  $("stats").innerHTML = stats.map(([label, value]) => `
     <div class="stat">
       <div class="stat__value">${value}</div>
       <div class="stat__label">${label}</div>
     </div>`).join("");
 
-  const recent = state.articles.slice(0, 6);
+  const recent = mine.slice(0, 6);
   $("recentList").innerHTML = recent.length
     ? recent.map(article => `
         <div class="row">
@@ -266,6 +328,7 @@ function renderDashboard() {
 
 $("articleSearch").addEventListener("input", renderArticles);
 $("articleFilter").addEventListener("change", renderArticles);
+$("onlyMine").addEventListener("change", renderArticles);
 
 function renderArticles() {
   /* keep the category filter in sync with the categories table */
@@ -275,15 +338,22 @@ function renderArticles() {
     state.categories.map(c => `<option value="${c.id}">${esc(c.name)}</option>`).join("");
   filter.value = chosen;
 
+  /* authors can browse everything, but usually want their own work */
+  $("onlyMineWrap").hidden = isAdmin();
+  const onlyMine = !isAdmin() && $("onlyMine").checked;
+
   const term = $("articleSearch").value.trim().toLowerCase();
   const list = state.articles.filter(article =>
     (!term || article.title.toLowerCase().includes(term)) &&
-    (!filter.value || article.category_id === Number(filter.value))
+    (!filter.value || article.category_id === Number(filter.value)) &&
+    (!onlyMine || canEdit(article))
   );
 
   $("articleList").innerHTML = list.length
-    ? list.map(article => `
-        <div class="row">
+    ? list.map(article => {
+        const mine = canEdit(article);
+        return `
+        <div class="row${mine ? "" : " row--readonly"}">
           <img class="row__thumb" src="${previewSrc(article.image_url)}" alt=""
                onerror="this.src='${PLACEHOLDER}'" />
 
@@ -293,32 +363,48 @@ function renderArticles() {
               <span class="tag">${esc(article.categories ? article.categories.name : "კატეგორიის გარეშე")}</span>
               ${state.hasAuthor ? `<span>${esc(article.author || "ავტორის გარეშე")}</span>` : ""}
               <span>${formatDate(article.published_at)}</span>
+              ${mine ? "" : `<span class="tag tag--muted">სხვისი — მხოლოდ კითხვა</span>`}
             </div>
           </div>
 
           <div class="row__switches">
-            ${switchHTML("გამოქვეყნებული", article.published,
-              `onchange="toggleArticle(${article.id}, 'published', this.checked)"`)}
-            ${switchHTML("მთავარ გვერდზე", article.show_on_home,
-              `onchange="toggleArticle(${article.id}, 'show_on_home', this.checked)"`)}
+            ${mine ? switchHTML("გამოქვეყნებული", article.published,
+              `onchange="toggleArticle(${article.id}, 'published', this.checked)"`) : ""}
+            ${mine && isAdmin() ? switchHTML("მთავარ გვერდზე", article.show_on_home,
+              `onchange="toggleArticle(${article.id}, 'show_on_home', this.checked)"`) : ""}
           </div>
 
           <div class="row__actions">
-            <button class="icon-btn" title="რედაქტირება"
-                    onclick="openArticleForm(${article.id})">${ICON.edit}</button>
-            <button class="icon-btn icon-btn--danger" title="წაშლა"
-                    onclick="removeArticle(${article.id})">${ICON.trash}</button>
+            ${mine ? `
+              <button class="icon-btn" title="რედაქტირება"
+                      onclick="openArticleForm(${article.id})">${ICON.edit}</button>
+              <button class="icon-btn icon-btn--danger" title="წაშლა"
+                      onclick="removeArticle(${article.id})">${ICON.trash}</button>` : ""}
           </div>
-        </div>`).join("")
+        </div>`;
+      }).join("")
     : `<p class="empty">${state.articles.length ? "ვერაფერი მოიძებნა." : "სიახლეები ჯერ არ დაგიმატებიათ."}</p>`;
 }
 
+/** Blocks an action on somebody else's article. The database refuses it
+    as well — this only gives a readable message instead of an error. */
+function guardArticle(id) {
+  const article = state.articles.find(a => a.id === id);
+  if (article && !canEdit(article)) {
+    toast("ეს სტატია სხვის ავტორს ეკუთვნის — რედაქტირება არ შეგიძლიათ.", true);
+    return null;
+  }
+  return article;
+}
+
 function toggleArticle(id, field, value) {
+  if (!guardArticle(id)) return;
   save(() => API.updateArticle(id, { [field]: value }), "შენახულია");
 }
 
 function removeArticle(id) {
-  const article = state.articles.find(a => a.id === id);
+  const article = guardArticle(id);
+  if (!article) return;
   if (!confirm(`წავშალოთ „${article.title}“?\nმოქმედება შეუქცევადია.`)) return;
   save(() => API.deleteArticle(id), "სიახლე წაიშალა");
 }
@@ -408,8 +494,9 @@ function renderCategories() {
                       onclick="moveCategory(${category.id}, 1)">${ICON.down}</button>
               <button class="icon-btn" title="რედაქტირება"
                       onclick="openCategoryForm(${category.id})">${ICON.edit}</button>
-              <button class="icon-btn icon-btn--danger" title="წაშლა"
-                      onclick="removeCategory(${category.id})">${ICON.trash}</button>
+              ${isAdmin() ? `
+                <button class="icon-btn icon-btn--danger" title="წაშლა"
+                        onclick="removeCategory(${category.id})">${ICON.trash}</button>` : ""}
             </div>
           </div>`;
       }).join("")
@@ -595,8 +682,13 @@ $("drawerForm").addEventListener("submit", async event => {
 /* ---------- article form ---------- */
 
 function openArticleForm(id) {
+  if (id && !guardArticle(id)) return;
+
   const article = state.articles.find(a => a.id === id) || {};
   const isNew   = !id;
+
+  /* an author signs with the name from their profile, but may change it */
+  const authorName = isNew ? (state.me && state.me.full_name) || "" : article.author || "";
 
   const body = `
     <label class="field">
@@ -607,7 +699,7 @@ function openArticleForm(id) {
     ${state.hasAuthor ? `
       <label class="field">
         <span class="field__label">ავტორი</span>
-        <input type="text" name="author" value="${esc(article.author || "")}"
+        <input type="text" name="author" value="${esc(authorName)}"
                placeholder="სახელი გვარი" />
       </label>` : AUTHOR_MISSING_HINT}
 
@@ -660,8 +752,14 @@ function openArticleForm(id) {
 
     <div class="field" style="display:flex; gap:24px; flex-wrap:wrap;">
       ${switchHTML("გამოქვეყნებული", isNew ? true : article.published, 'name="published"')}
-      ${switchHTML("მთავარ გვერდზე", isNew ? true : article.show_on_home, 'name="show_on_home"')}
-    </div>`;
+      ${isAdmin()
+        ? switchHTML("მთავარ გვერდზე", isNew ? true : article.show_on_home, 'name="show_on_home"')
+        : ""}
+    </div>
+
+    ${isAdmin() ? "" : `
+      <p class="hint">სიახლე შენახვისთანავე გამოჩნდება საიტზე.
+        მთავარ გვერდზე და სლაიდერში მოხვედრას ადმინისტრატორი განკარგავს.</p>`}`;
 
   openDrawer(isNew ? "ახალი სიახლე" : "სიახლის რედაქტირება", body, (data, root) => {
     const values = {
@@ -674,7 +772,10 @@ function openArticleForm(id) {
       read_time:    data.get("read_time").trim() || "3 წთ",
       published_at: new Date(data.get("published_at") || Date.now()).toISOString(),
       published:    data.get("published") === "on",
-      show_on_home: data.get("show_on_home") === "on"
+
+      // an author has no homepage switch — keep whatever the admin chose
+      show_on_home: isAdmin() ? data.get("show_on_home") === "on"
+                              : (isNew ? true : article.show_on_home)
     };
 
     // only send the column if the database already has it
@@ -684,6 +785,10 @@ function openArticleForm(id) {
       // new homepage articles go to the top of "Latest News"
       const lowest = Math.min(0, ...state.articles.map(a => a.home_order));
       values.home_order = lowest - 1;
+
+      // the article belongs to whoever wrote it (003-roles.sql)
+      if (state.hasRoles) values.author_id = state.userId;
+
       return save(() => API.createArticle(values), "სიახლე დაემატა");
     }
     return save(() => API.updateArticle(id, values), "ცვლილებები შენახულია");

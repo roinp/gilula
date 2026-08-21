@@ -135,6 +135,30 @@
     async getUser() {
       const { data } = await sb.auth.getSession();
       return data.session ? data.session.user : null;
+    },
+
+    /* ---------- who is signed in ---------- */
+
+    /**
+     * The signed-in user's profile: { id, full_name, role }.
+     * role is "admin" (everything) or "author" (own articles only).
+     *
+     * Returns null when nobody is signed in, or while
+     * supabase/003-roles.sql has not been run yet — the admin panel
+     * then keeps working exactly as it did before roles existed.
+     */
+    async getProfile() {
+      const user = await API.getUser();
+      if (!user) return null;
+
+      const { data, error } = await sb
+        .from("profiles")
+        .select("id, full_name, role")
+        .eq("id", user.id)
+        .maybeSingle();
+
+      if (error || !data) return null;
+      return data;
     }
   };
 

@@ -244,6 +244,20 @@ svg  { width: 20px; height: 20px; fill: currentColor; flex: none; }
   flex-direction: column;
   gap: 8px;
 }
+/* who is signed in, and with which role */
+.sidebar__user {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  padding: 8px 14px 12px;
+}
+.sidebar__user-name {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text);
+}
+
 .sidebar__view {
   padding: 10px 14px;
   font-size: 14px;
@@ -359,6 +373,22 @@ svg  { width: 20px; height: 20px; fill: currentColor; flex: none; }
 .toolbar__search:focus,
 .toolbar__select:focus { border-color: var(--green); }
 
+/* "only my articles" — shown to authors, hidden for the admin */
+.toolbar__check {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  font-size: 14px;
+  color: var(--muted);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  cursor: pointer;
+  user-select: none;
+}
+.toolbar__check input { accent-color: var(--green); }
+
 
 /* ---------- 6. Rows ---------- */
 .row {
@@ -370,6 +400,10 @@ svg  { width: 20px; height: 20px; fill: currentColor; flex: none; }
 }
 .row:last-child { border-bottom: none; }
 .row:hover { background: var(--surface-2); }
+
+/* somebody else's article — visible, but nothing to press */
+.row--readonly .row__thumb,
+.row--readonly .row__main { opacity: .62; }
 
 .row__thumb {
   width: 68px;

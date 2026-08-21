@@ -34,7 +34,8 @@ shows today — so nothing looks empty on the first run.
 3. Click **Create user**.
 
 This is the email and password you will use to sign in to the admin panel.
-Repeat the step any time you want to give someone else access.
+To give somebody else access, see **Giving someone else access** below — new
+users become **authors** and may only touch their own articles.
 
 ## 4. Connect the website to the database
 
@@ -76,6 +77,77 @@ Then open:
 
 When you publish the site (GitHub Pages, Netlify, Vercel, or normal hosting),
 just upload the whole folder — everything is plain HTML, CSS and JavaScript.
+
+---
+
+## Giving someone else access
+
+There are two roles:
+
+| | **admin** (you) | **author** |
+|---|---|---|
+| Add an article | ✅ | ✅ |
+| Edit / delete **own** article | ✅ | ✅ |
+| Edit / delete **someone else's** article | ✅ | ❌ (read only) |
+| Publish own article | ✅ | ✅ — instantly, no approval needed |
+| **მთავარი გვერდი** — homepage & slider order | ✅ | ❌ (section is hidden) |
+| Add / rename a category | ✅ | ✅ |
+| Delete a category | ✅ | ❌ |
+| Upload images | ✅ | ✅ |
+| Change roles | ✅ (SQL) | ❌ |
+
+### One-time: turn roles on
+
+SQL Editor → New query → paste **`supabase/003-roles.sql`** → **Run**.
+
+Every user that exists at that moment (i.e. you) becomes **admin**.
+Every user created afterwards becomes an **author** automatically.
+All existing articles are assigned to the oldest account — yours.
+
+> Until you run this file the panel behaves exactly as before: everyone who can
+> sign in is a full admin.
+
+### Every new person
+
+1. **Authentication** → **Users** → **Add user** → *Create new user*.
+2. Their email + a password, **Auto Confirm User** on → **Create user**.
+3. Optional, but nice — write their name, so it is pre-filled in the article
+   form (SQL Editor):
+
+```sql
+update profiles set full_name = 'სახელი გვარი'
+where id = (select id from auth.users where email = 'avtori@example.com');
+```
+
+Send them the address `/admin/` plus the email and password. That is all.
+
+### Checking or changing roles
+
+```sql
+-- who is who
+select p.role, p.full_name, u.email
+from profiles p join auth.users u on u.id = p.id
+order by p.role, u.email;
+
+-- promote to full admin
+update profiles set role = 'admin'
+where id = (select id from auth.users where email = 'avtori@example.com');
+
+-- back down to author
+update profiles set role = 'author'
+where id = (select id from auth.users where email = 'avtori@example.com');
+```
+
+To take access away completely: **Authentication** → **Users** → the three dots
+next to the person → **Delete user**. Their articles stay on the site; they just
+lose their owner (and from then on only an admin can edit them).
+
+The rules live in the database, not in the JavaScript — hiding a button is only
+cosmetic, the actual "not your article" refusal comes from Supabase itself.
+
+An author's new article does land in **Latest News** (and therefore in the
+slider) like any other, they simply cannot reorder or remove it — that stays
+your job in **მთავარი გვერდი**.
 
 ---
 
@@ -149,6 +221,7 @@ admin/admin.css       admin styles
 admin/admin.js        admin logic
 
 supabase/schema.sql   run once to create the database
+supabase/003-roles.sql  run once to turn on admin / author roles
 images/               the original photos shipped with the site
 ```
 
