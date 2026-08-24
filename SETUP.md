@@ -283,3 +283,9 @@ storage bucket and its permissions.
 
 **Nothing loads and the browser console shows a CORS error** — you opened the file
 directly with `file://`. Use a local server as shown in step 5.
+
+**Vercel deployment fails with `Invalid vercel.json`** — `vercel.json` is checked
+against a strict schema that rejects any unknown top-level key. JSON has no
+comments, and `$comment` is *not* an allowed key, so notes must live here in
+`SETUP.md` and not in `vercel.json`. Only `$schema` and real settings
+(`routes`, `headers`, `rewrites`, …) belong in that file.
