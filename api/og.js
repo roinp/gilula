@@ -1,16 +1,23 @@
 /* ============================================================
    GILULA SPORT — Open Graph for social networks
    ------------------------------------------------------------
-   Facebook, Twitter/X, WhatsApp, Telegram, LinkedIn … do NOT
-   run JavaScript. They only read the raw HTML that the server
-   sends back. article.html is an empty shell — the title and
-   the picture are added later by js/article.js — so a shared
+   Facebook, Messenger, WhatsApp, Telegram, Twitter/X, LinkedIn …
+   do NOT run JavaScript. They only read the raw HTML that the
+   server sends back. article.html is an empty shell — the title
+   and the picture are added later by js/article.js — so a shared
    link had no picture and no title.
 
-   vercel.json sends ONLY those crawlers to this function
-   (real visitors keep getting the plain static article.html).
-   Here we look the article up in Supabase on the server and
-   answer with a small HTML page that carries the og: tags.
+   vercel.json sends EVERY /article.html request here, not just
+   the ones that look like a crawler. Guessing the crawler from
+   its user-agent was the old way and it kept failing: Messenger
+   and the other apps keep changing their name, and Vercel's cache
+   could hand the crawler's answer to a visitor (or the other way
+   round), because both live at the very same address.
+
+   So now everybody gets one and the same answer: the real
+   article.html, with the title and the og: tags written into its
+   <head> here, on the server. The visitor sees the normal
+   website, the crawler finds the picture and the headline.
 
    Nothing to configure: the database address and the public
    key are read from js/config.js, exactly like the website.
@@ -207,14 +214,11 @@ async function fetchArticle(id, origin) {
   return Array.isArray(rows) && rows.length ? rows[0] : null;
 }
 
-/* ---------- the page the crawler receives ---------- */
+/* ---------- the page everyone receives ---------- */
 
-function page(meta) {
-  return `<!DOCTYPE html>
-<html lang="ka">
-<head>
-<meta charset="UTF-8" />
-<title>${esc(meta.title)}</title>
+/** The <head> block: the tab title plus every social-network tag. */
+function head(meta) {
+  return `<title>${esc(meta.title)}</title>
 <link rel="canonical" href="${esc(meta.url)}" />
 <meta name="description" content="${esc(meta.description)}" />
 
@@ -236,14 +240,48 @@ ${meta.author ? `<meta property="article:author" content="${esc(meta.author)}" /
 <meta name="twitter:card" content="summary_large_image" />
 <meta name="twitter:title" content="${esc(meta.cardTitle)}" />
 <meta name="twitter:description" content="${esc(meta.description)}" />
-<meta name="twitter:image" content="${esc(meta.image)}" />
+<meta name="twitter:image" content="${esc(meta.image)}" />`;
+}
 
-<script>location.replace(${JSON.stringify(meta.url)});</script>
+/** The untouched article.html, straight from the static files.
+    vercel.json publishes it under /_shell/article — that address is NOT
+    routed back here, so this cannot turn into a loop. */
+async function shell(origin) {
+  const response = await fetch(`${origin}/_shell/article`, {
+    signal: AbortSignal.timeout(4000)
+  });
+  if (!response.ok) throw new Error(`shell answered ${response.status}`);
+
+  const html = await response.text();
+  if (!/<\/head>/i.test(html)) throw new Error("shell has no <head>");
+  return html;
+}
+
+/** Puts the tags into the real page: the existing <title> is swapped for
+    the whole block, so the visitor gets the normal website and the
+    crawler finds the picture and the headline in the very same answer. */
+function inject(html, meta) {
+  const block = head(meta);
+
+  if (/<title[^>]*>[\s\S]*?<\/title>/i.test(html)) {
+    return html.replace(/<title[^>]*>[\s\S]*?<\/title>/i, () => block);
+  }
+  return html.replace(/<\/head>/i, () => block + "\n</head>");
+}
+
+/** Used only if the static file cannot be read — a plain but valid card. */
+function barePage(meta) {
+  return `<!DOCTYPE html>
+<html lang="ka">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+${head(meta)}
 </head>
 <body>
-<h1>${esc(meta.title)}</h1>
+<h1>${esc(meta.cardTitle)}</h1>
 <p>${esc(meta.description)}</p>
-<p><a href="${esc(meta.url)}">${esc(meta.title)}</a></p>
+<p><a href="${esc(SITE_URL)}/">GILULA SPORT</a></p>
 </body>
 </html>`;
 }
@@ -251,9 +289,8 @@ ${meta.author ? `<meta property="article:author" content="${esc(meta.author)}" /
 /* ---------- handler ---------- */
 
 module.exports = async (req, res) => {
-  // `origin` is the address the crawler actually used — it is what we read
-  // js/config.js from, so preview deployments keep working. The card itself
-  // always points at SITE_URL.
+  // `origin` is the address the visitor actually used, so preview
+  // deployments keep working. The card itself always points at SITE_URL.
   const origin = originOf(req);
   const id = (req.query && req.query.id) || "";
   const url = id ? `${SITE_URL}/article.html?id=${encodeURIComponent(id)}` : SITE_URL + "/";
@@ -272,26 +309,28 @@ module.exports = async (req, res) => {
     author: ""
   };
 
-  try {
-    const article = id ? await fetchArticle(id, origin) : null;
+  // The article and the untouched page are fetched at the same time —
+  // neither one has to wait for the other.
+  const [found, staticHtml] = await Promise.all([
+    (id ? fetchArticle(id, origin) : Promise.resolve(null))
+      .catch((error) => { console.error("og article:", error.message); return null; }),
+    shell(origin)
+      .catch((error) => { console.error("og shell:", error.message); return null; })
+  ]);
 
-    if (article) {
-      meta.type = "article";
-      meta.title = `${article.title} — GILULA SPORT`;
-      // og:site_name already says GILULA SPORT, so the card keeps the plain title
-      meta.cardTitle = article.title;
-      meta.description =
-        plain(article.excerpt, 300) || plain(article.content, 300) || FALLBACK_DESC;
-      meta.image =
-        absolute(article.image_url, origin) ||
-        absolute(firstImageIn(article.content), origin) ||
-        meta.image;
-      meta.publishedAt = article.published_at || "";
-      meta.author = article.author || "";
-    }
-  } catch (error) {
-    // The crawler still gets a valid card with the logo.
-    console.error("og:", error.message);
+  if (found) {
+    meta.type = "article";
+    meta.title = `${found.title} — GILULA SPORT`;
+    // og:site_name already says GILULA SPORT, so the card keeps the plain title
+    meta.cardTitle = found.title;
+    meta.description =
+      plain(found.excerpt, 300) || plain(found.content, 300) || FALLBACK_DESC;
+    meta.image =
+      absolute(found.image_url, origin) ||
+      absolute(firstImageIn(found.content), origin) ||
+      meta.image;
+    meta.publishedAt = found.published_at || "";
+    meta.author = found.author || "";
   }
 
   const size = await imageSize(meta.image);
@@ -301,10 +340,12 @@ module.exports = async (req, res) => {
     meta.imageType = size.type;
   }
 
+  const body = staticHtml ? inject(staticHtml, meta) : barePage(meta);
+
   res.setHeader("Content-Type", "text/html; charset=utf-8");
   res.setHeader(
     "Cache-Control",
-    "public, max-age=0, s-maxage=600, stale-while-revalidate=86400"
+    "public, max-age=0, s-maxage=300, stale-while-revalidate=86400"
   );
-  res.status(200).send(page(meta));
+  res.status(200).send(body);
 };

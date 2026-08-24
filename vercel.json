@@ -1,18 +1,16 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-
   "routes": [
     {
+      "src": "^/_shell/article$",
+      "dest": "/article.html"
+    },
+    {
       "src": "^/article\\.html$",
-      "has": [
-        {
-          "type": "header",
-          "key": "user-agent",
-          "value": ".*(facebookexternalhit|facebookcatalog|facebookexternalua|meta-externalagent|Facebot|Twitterbot|LinkedInBot|WhatsApp|TelegramBot|Discordbot|Slackbot|SkypeUriPreview|vkShare|redditbot|Pinterest|Applebot|Iframely|Embedly|Viber|Mastodon|Bluesky|Snapchat|Yahoo Link Preview).*"
-        }
-      ],
       "dest": "/api/og"
     },
-    { "handle": "filesystem" }
+    {
+      "handle": "filesystem"
+    }
   ]
 }

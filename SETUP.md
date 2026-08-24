@@ -225,7 +225,7 @@ supabase/003-roles.sql  run once to turn on admin / author roles
 images/               the original photos shipped with the site
 
 api/og.js             the picture + title Facebook shows for a shared link
-vercel.json           sends only social-network crawlers to api/og.js
+vercel.json           sends every /article.html request to api/og.js
 ```
 
 ---
@@ -237,11 +237,21 @@ They only read the HTML the server sends back — and `article.html` is an empty
 shell, the title and the picture arrive afterwards from the database. That is
 why a shared article used to appear without a picture.
 
-`api/og.js` fixes it. `vercel.json` recognises those crawlers by their
-user-agent and sends **only them** to that function, which looks the article up
-in Supabase on the server and answers with the `og:` tags (title, description,
-featured image). Ordinary visitors are untouched — they still get the plain
-static `article.html`.
+`api/og.js` fixes it. `vercel.json` sends **every** `/article.html` request to
+that function. It looks the article up in Supabase on the server, takes the
+ordinary `article.html`, and writes the title and the `og:` tags (title,
+description, featured image) into its `<head>` before answering.
+
+Everyone — visitor and crawler alike — gets exactly the same page: the normal
+website, with the sharing card already inside it. Earlier the crawler was
+recognised by its user-agent and only it was sent to the function; that kept
+breaking, because Messenger and the other apps keep changing their name, and
+because Vercel's cache could hand one answer to the wrong side — both live at
+the very same address.
+
+The untouched `article.html` is published once more under `/_shell/article`;
+that is where the function reads it from. Do not remove that line from
+`vercel.json`.
 
 Nothing to configure: the function reads the database address and the public key
 straight from `js/config.js`, so that file stays the only one you edit. (If you
@@ -260,8 +270,9 @@ force a fresh look:
 2. Paste the article address (`https://your-site/article.html?id=15`)
 3. Press **Scrape Again** — the picture appears.
 
-You only need this for links that were already shared before the fix. New links
-work straight away.
+You only need this for links Facebook has already seen. Messenger shows the very
+same card, out of the very same memory, so a link that was shared before the fix
+keeps looking empty in Messenger too until you scrape it again here.
 
 ### The picture itself
 
