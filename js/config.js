@@ -8,8 +8,8 @@
    SUPABASE_ANON_KEY  the public key — either the new
                       "sb_publishable_…" one or the older "eyJ…" one
 
-   This is the ONLY file you have to edit. Both the website and
-   the admin panel read it.
+   This is the ONLY file you have to edit. The website, the admin
+   panel and api/og.js (the Facebook link preview) all read it.
 
    The key is safe to keep in the code — the database rules
    (see supabase/schema.sql) only let visitors READ published

@@ -1,0 +1,18 @@
+{
+  "$comment": "Facebook, WhatsApp, Telegram … do not run JavaScript, so the empty article.html shell gave them no title and no picture. Only those crawlers are sent to /api/og, which builds the og: tags on the server. Real visitors are untouched — they still get the plain static files. These rules are checked BEFORE the filesystem, which is why they use `routes` and not `rewrites`.",
+
+  "routes": [
+    {
+      "src": "^/article\\.html$",
+      "has": [
+        {
+          "type": "header",
+          "key": "user-agent",
+          "value": ".*(facebookexternalhit|facebookcatalog|facebookexternalua|meta-externalagent|Facebot|Twitterbot|LinkedInBot|WhatsApp|TelegramBot|Discordbot|Slackbot|SkypeUriPreview|vkShare|redditbot|Pinterest|Applebot|Iframely|Embedly|Viber|Mastodon|Bluesky|Snapchat|Yahoo Link Preview).*"
+        }
+      ],
+      "dest": "/api/og"
+    },
+    { "handle": "filesystem" }
+  ]
+}

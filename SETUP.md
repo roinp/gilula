@@ -223,7 +223,52 @@ admin/admin.js        admin logic
 supabase/schema.sql   run once to create the database
 supabase/003-roles.sql  run once to turn on admin / author roles
 images/               the original photos shipped with the site
+
+api/og.js             the picture + title Facebook shows for a shared link
+vercel.json           sends only social-network crawlers to api/og.js
 ```
+
+---
+
+## Sharing a link on Facebook
+
+Facebook, WhatsApp, Telegram, LinkedIn and the rest do **not** run JavaScript.
+They only read the HTML the server sends back — and `article.html` is an empty
+shell, the title and the picture arrive afterwards from the database. That is
+why a shared article used to appear without a picture.
+
+`api/og.js` fixes it. `vercel.json` recognises those crawlers by their
+user-agent and sends **only them** to that function, which looks the article up
+in Supabase on the server and answers with the `og:` tags (title, description,
+featured image). Ordinary visitors are untouched — they still get the plain
+static `article.html`.
+
+Nothing to configure: the function reads the database address and the public key
+straight from `js/config.js`, so that file stays the only one you edit. (If you
+would rather keep them in Vercel → *Settings* → *Environment Variables* as
+`SUPABASE_URL` and `SUPABASE_ANON_KEY`, the function prefers those.)
+
+> **This only works on Vercel.** On GitHub Pages or plain file hosting there is
+> no server to run `api/og.js`, so the picture would be missing again.
+
+### After you publish a change
+
+Facebook remembers the first thing it saw about a link, sometimes for weeks. To
+force a fresh look:
+
+1. Open <https://developers.facebook.com/tools/debug/>
+2. Paste the article address (`https://your-site/article.html?id=15`)
+3. Press **Scrape Again** — the picture appears.
+
+You only need this for links that were already shared before the fix. New links
+work straight away.
+
+### The picture itself
+
+Facebook wants at least **200 × 200 px**, and shows the big card only from about
+**600 × 315 px**. `1200 × 630` is the safest size. A picture smaller than that
+still shares, it just gets the small square card. Articles with no featured
+image fall back to `logo.jpg`.
 
 ## Troubleshooting
 
