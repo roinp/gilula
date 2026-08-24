@@ -13,6 +13,10 @@ async function renderArticle() {
     document.title = `${article.title} — GILULA SPORT`;
     if (category) markActiveNav(category.name);
 
+    // GTM / GA4 — "article_view", see js/analytics.js.
+    // Fires once, with the data of the article on the screen.
+    if (window.Analytics) Analytics.trackArticleView(article);
+
     articleBox.innerHTML = `
       <header class="article__head">
         ${category ? `<a href="category.html?name=${encodeURIComponent(category.name)}" class="badge">${esc(category.name)}</a>` : ""}

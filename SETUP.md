@@ -215,6 +215,7 @@ js/common.js          shared helpers: mobile menu, news card
 js/home.js            homepage
 js/article.js         article page
 js/category.js        category page
+js/analytics.js       GTM / GA4 — the "article_view" event
 
 admin/index.html      admin panel
 admin/admin.css       admin styles
@@ -227,6 +228,67 @@ images/               the original photos shipped with the site
 api/og.js             the picture + title Facebook shows for a shared link
 vercel.json           sends every /article.html request to api/og.js
 ```
+
+---
+
+## Google Tag Manager / GA4
+
+Google Tag Manager (container `GTM-T66C6SVC`) is already on every page.
+The website itself never sends anything to GA4 — it only writes the article
+information into `window.dataLayer`, and GTM decides what to do with it.
+
+**`js/analytics.js`** pushes one event, `article_view`, on the article page:
+
+```js
+window.dataLayer.push({
+  event: "article_view",
+  article_id: "87421",
+  article_title: "დინამო თბილისმა მნიშვნელოვანი გამარჯვება მოიპოვა",
+  article_category: "football",
+  article_subcategory: "georgian-football",
+  article_author: "Nika Example",
+  article_publish_date: "2026-08-24",
+  article_type: "news"
+});
+```
+
+Where the values come from:
+
+| Parameter | Source |
+|---|---|
+| `article_id` | the article's database id |
+| `article_title` | `title` |
+| `article_category` | the category name as a latin slug (ფეხბურთი → `football`) |
+| `article_subcategory` | only if an article ever gets a `subcategory` field — otherwise the parameter is left out |
+| `article_author` | `author` (left out while it is empty) |
+| `article_publish_date` | `published_at`, as `YYYY-MM-DD` |
+| `article_type` | `video` for the ვიდეო category, otherwise `news` |
+
+**New articles need nothing.** Every article is drawn by `js/article.js`, and
+that file reports the article it has just loaded. Whatever you publish from the
+admin panel from now on is tracked the moment somebody opens it.
+
+The event fires **once** per article — a rerender or a repeated call does not
+add a second entry. If the site is ever rewritten with a router (React,
+Next.js, Vue …), `js/analytics.js` also notices the URL change and lets the
+next article report itself.
+
+### Checking it works
+
+Open an article, press `F12` → **Console**, and type:
+
+```js
+window.dataLayer
+```
+
+One `{ event: "article_view", … }` entry with the right article should be
+there. GTM's own **Preview** mode shows the same event.
+
+### In GTM
+
+Create a **Custom Event** trigger with the event name `article_view`, a
+**Data Layer Variable** for each parameter above, and one **GA4 Event** tag
+that sends them. Nothing has to change in the website for that.
 
 ---
 
