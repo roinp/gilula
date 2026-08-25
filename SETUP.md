@@ -226,6 +226,7 @@ supabase/003-roles.sql  run once to turn on admin / author roles
 images/               the original photos shipped with the site
 
 api/og.js             the picture + title Facebook shows for a shared link
+api/canonical.js      sends gilula.vercel.app on to gilula.ge
 vercel.json           sends every /article.html request to api/og.js
 ```
 
@@ -342,6 +343,32 @@ Facebook wants at least **200 × 200 px**, and shows the big card only from abou
 **600 × 315 px**. `1200 × 630` is the safest size. A picture smaller than that
 still shares, it just gets the small square card. Articles with no featured
 image fall back to `logo.jpg`.
+
+**Upload pictures at least 1200 px wide.** Everything else is handled for you —
+`api/og.js` asks Supabase for a 1200 px copy — but nothing can enlarge a picture
+that was small to begin with, and one under 600 px wide gets the small card.
+
+**WebP.** Facebook and Messenger cannot draw a WebP picture; the card comes up
+with an empty box. `api/og.js` gets around it by asking Supabase's
+`render/image` address for the same file, which hands it over as a JPEG. It
+happens by itself — you can keep uploading WebP.
+
+### Two addresses, one site
+
+The site answers both on `gilula.ge` and on `gilula.vercel.app`. Facebook keeps
+a separate memory per address, so an article shared from the Vercel one used to
+show `gilula.vercel.app` on the card. `vercel.json` now sends everything that
+arrives on `gilula.vercel.app` to `api/canonical.js`, which forwards it to
+`gilula.ge` — the part after the question mark included. Preview deployments
+have their own names and are untouched.
+
+Cards that were already filed under the Vercel address keep showing it until you
+scrape them again (see above).
+
+### The tab icon
+
+`logo.jpg` is the picture in the browser tab, wired up in the `<head>` of every
+page. If you replace the file, keep the name.
 
 ## Troubleshooting
 

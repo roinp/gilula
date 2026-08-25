@@ -2,6 +2,16 @@
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "routes": [
     {
+      "src": "/(.*)",
+      "has": [
+        {
+          "type": "host",
+          "value": "gilula.vercel.app"
+        }
+      ],
+      "dest": "/api/canonical"
+    },
+    {
       "src": "^/_shell/article$",
       "dest": "/article.html"
     },

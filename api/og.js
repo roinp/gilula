@@ -80,6 +80,40 @@ function firstImageIn(html) {
   return match ? match[1] : "";
 }
 
+/* Facebook and Messenger cannot draw a WebP picture — the card comes up
+   with an empty grey box instead. Supabase can hand the very same file
+   over as a JPEG: its "render/image" address resizes the picture and
+   chooses the format from what the caller says it accepts, and Facebook
+   accepts every format, so it is given the JPEG. 1200 px wide is also
+   exactly what Facebook wants for the big card, so narrow pictures stop
+   falling under its 600 px limit.
+
+   Only pictures that live in our own Supabase storage can be converted;
+   anything else is left exactly as it is. */
+function supabaseJpeg(url) {
+  const value = String(url || "");
+  const objectPath = "/storage/v1/object/public/";
+  if (!value.includes(objectPath)) return "";
+
+  return value.replace(objectPath, "/storage/v1/render/image/public/") +
+    (value.includes("?") ? "&" : "?") + "width=1200&quality=80";
+}
+
+/** The address Facebook should be given, together with its size.
+    The converted picture is preferred — but only if it really answers.
+    If it does not (Supabase turns the feature off, the file is missing),
+    the original address is used, exactly as before. */
+async function pickImage(url) {
+  const converted = supabaseJpeg(url);
+
+  if (converted) {
+    const size = await imageSize(converted);
+    if (size && size.width && size.height) return { url: converted, size };
+  }
+
+  return { url, size: await imageSize(url) };
+}
+
 /** The site's own address, as the visitor reached it. */
 function originOf(req) {
   const host = req.headers["x-forwarded-host"] || req.headers.host;
@@ -333,11 +367,12 @@ module.exports = async (req, res) => {
     meta.author = found.author || "";
   }
 
-  const size = await imageSize(meta.image);
-  if (size && size.width && size.height) {
-    meta.imageWidth = String(size.width);
-    meta.imageHeight = String(size.height);
-    meta.imageType = size.type;
+  const picked = await pickImage(meta.image);
+  meta.image = picked.url;
+  if (picked.size && picked.size.width && picked.size.height) {
+    meta.imageWidth = String(picked.size.width);
+    meta.imageHeight = String(picked.size.height);
+    meta.imageType = picked.size.type;
   }
 
   const body = staticHtml ? inject(staticHtml, meta) : barePage(meta);
