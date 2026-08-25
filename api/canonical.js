@@ -18,8 +18,13 @@
 const SITE_URL = (process.env.SITE_URL || "https://gilula.ge").replace(/\/+$/, "");
 
 module.exports = (req, res) => {
+  const host = req.headers["x-forwarded-host"] || req.headers.host || "";
   const path = String(req.url || "/");
-  const target = SITE_URL + (path.startsWith("/") ? path : "/" + path);
+
+  // Somebody opened this address by hand on the site's own name. Sending
+  // them where they already are would loop forever, so they go home.
+  const alreadyHere = SITE_URL.replace(/^https?:\/\//, "") === host;
+  const target = alreadyHere ? SITE_URL + "/" : SITE_URL + (path.startsWith("/") ? path : "/" + path);
 
   // 308 keeps the method and tells Facebook the move is permanent, so it
   // files the card under the new address instead of the old one.
