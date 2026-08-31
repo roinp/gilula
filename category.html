@@ -101,13 +101,29 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
       <div class="section__head">
         <h2 class="section__title" id="categoryTitle">იტვირთება…</h2>
-        <p class="section__subtitle">ამ კატეგორიის ყველა სიახლე</p>
+        <p class="section__subtitle" id="categorySubtitle">ამ კატეგორიის ყველა სიახლე</p>
+      </div>
+
+      <!-- Only on the „ვიდეო“ page: every video from the admin panel,
+           all at once. Nothing has to be tagged by hand — see js/videos.js. -->
+      <div class="videos" id="categoryVideos" hidden>
+        <div class="videos__grid" id="categoryVideoGrid"></div>
       </div>
 
       <div class="news__grid" id="categoryGrid"></div>
 
     </div>
   </section>
+
+  <!-- the YouTube player opens here; the iframe is built only on click -->
+  <div class="vmodal" id="videoModal" hidden>
+    <div class="vmodal__backdrop" data-close></div>
+    <div class="vmodal__box" role="dialog" aria-modal="true" aria-labelledby="videoModalTitle">
+      <button type="button" class="vmodal__close" data-close aria-label="დახურვა">&times;</button>
+      <div class="vmodal__frame" id="videoFrame"></div>
+      <h3 class="vmodal__title" id="videoModalTitle"></h3>
+    </div>
+  </div>
 
   <!-- ============ FOOTER ============ -->
   <footer class="footer">
@@ -125,6 +141,8 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   <script src="js/config.js"></script>
   <script src="js/api.js"></script>
   <script src="js/common.js"></script>
+  <script src="js/youtube.js"></script>
+  <script src="js/videos.js"></script>
   <script src="js/category.js"></script>
 
   <script src="js/translate.js"></script>

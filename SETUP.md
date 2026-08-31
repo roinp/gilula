@@ -205,14 +205,27 @@ homepage. Nothing in the code has to change.
 3. The **thumbnail** fills itself in with YouTube's own picture. To use your
    own instead, press **ფაილის ატვირთვა** or paste an image address — an
    uploaded picture is never overwritten when you change the link afterwards.
-4. **თანმიმდევრობა** is the position on the homepage; ↑ ↓ in the list change it too.
+4. **თანმიმდევრობა** is the position in the row; ↑ ↓ in the list change it too.
+   The homepage shows **four videos at a time** — the first four of this order.
 5. **აქტიური** on = the video is visible on the website. Switch it off to hide
    a video without deleting it.
 6. **შენახვა**.
 
 The video appears on the homepage straight away, under “ვიდეო გალერეა”.
 Visitors see the picture and the title; pressing the card opens the player.
-When no video is active the whole section disappears by itself.
+
+You can add as many videos as you like: four are visible at a time and the
+arrows on either side move the row on by four more (on a phone the row is
+swiped instead, and the arrows are hidden). With four videos or fewer the
+arrows do not appear at all, and when no video is active the whole section
+disappears by itself.
+
+**The „ვიდეო“ menu item shows the same videos**, all of them at once, on
+`category.html?name=ვიდეო`. You never tag a video with a category — the page
+simply lists the whole videos table, so anything you add here appears there
+too. Articles you put in the “ვიდეო” category still show underneath.
+If you rename that menu item, change `VIDEO_CATEGORY` at the top of
+`js/category.js` to match.
 
 ### Adding a category
 
@@ -252,9 +265,9 @@ js/api.js             all database calls, shared by site and admin
 js/common.js          shared helpers: mobile menu, news card
 js/youtube.js         reads a YouTube link → embed address + picture
 js/home.js            homepage
-js/videos.js          the "ვიდეო გალერეა" section + the player window
+js/videos.js          the "ვიდეო გალერეა" row (4 at a time) + the player window
 js/article.js         article page
-js/category.js        category page
+js/category.js        category page (the "ვიდეო" one also lists every video)
 js/analytics.js       GTM / GA4 — the "article_view" event
 
 admin/index.html      admin panel

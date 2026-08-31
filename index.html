@@ -136,7 +136,17 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         <p class="section__subtitle">საუკეთესო მომენტები, ინტერვიუები და მიმოხილვები</p>
       </div>
 
-      <div class="videos__grid" id="videosGrid"></div>
+      <!-- 4 videos are visible at a time; the rest are one arrow (or one
+           swipe) away — nothing is cut off, the row simply scrolls. -->
+      <div class="videos__carousel">
+        <button class="videos__arrow videos__arrow--prev" id="videosPrev"
+                type="button" aria-label="წინა ვიდეოები">&#10094;</button>
+
+        <div class="videos__track" id="videosTrack"></div>
+
+        <button class="videos__arrow videos__arrow--next" id="videosNext"
+                type="button" aria-label="შემდეგი ვიდეოები">&#10095;</button>
+      </div>
 
     </div>
   </section>

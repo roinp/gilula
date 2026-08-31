@@ -668,11 +668,73 @@ a.badge:hover { background: var(--btn-hover-bg); color: var(--btn-hover-text); }
 /* The cards are filled from the `videos` table (admin panel → „ვიდეოები“).
    Each card is a button: pressing it opens the YouTube player in .vmodal. */
 
+/* 4 cards fit in the row; the rest are reached with the arrows or a swipe.
+   --per-view is the only thing the media queries change. */
+.videos {
+  --per-view:     4;
+  --video-gap:    24px;
+  --arrow-gutter: 58px;  /* the strip the arrows sit in, beside the cards */
+}
+
+/* the arrows live in their own strip on either side, so they never cover a video */
+.videos__carousel {
+  position: relative;
+  padding-inline: var(--arrow-gutter);
+}
+
+/* every video in one plain grid — the „ვიდეო“ category page,
+   where there is room to show them all at once */
 .videos__grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 24px;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--video-gap);
 }
+
+.videos__track {
+  display: flex;
+  gap: var(--video-gap);
+  overflow-x: auto;
+  scroll-behavior: smooth;
+  scroll-snap-type: x mandatory;
+  /* room for the hover lift, otherwise the cards are clipped while rising */
+  padding: 8px 0;
+
+  /* the arrows do the steering — no scrollbar under the cards */
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.videos__track::-webkit-scrollbar { display: none; }
+
+.videos__track > .video-card {
+  flex: 0 0 calc((100% - (var(--per-view) - 1) * var(--video-gap)) / var(--per-view));
+  scroll-snap-align: start;
+}
+
+/* arrows — same shape as the ones on the slider above */
+.videos__arrow {
+  position: absolute;
+  z-index: 2;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--arrow-bg);
+  border: 1px solid var(--border);
+  color: var(--green-text);
+  font-size: 18px;
+  border-radius: 50%;
+  cursor: pointer;
+  box-shadow: var(--shadow-badge);
+  transition: background .2s, color .2s, opacity .2s;
+}
+.videos__arrow:hover { background: var(--green); color: var(--on-green); }
+.videos__arrow[disabled] { opacity: .3; cursor: default; }
+.videos__arrow[disabled]:hover { background: var(--arrow-bg); color: var(--green-text); }
+.videos__arrow--prev { left: 0; }
+.videos__arrow--next { right: 0; }
 
 .video-card {
   display: flex;
@@ -914,6 +976,9 @@ a.badge:hover { background: var(--btn-hover-bg); color: var(--btn-hover-text); }
   .news__grid,
   .news__grid--3,
   .contact__grid { grid-template-columns: repeat(3, 1fr); }
+
+  .videos { --per-view: 3; --arrow-gutter: 52px; }
+  .videos__grid { grid-template-columns: repeat(3, 1fr); }
 }
 
 /* tablet: burger menu, 2 cards per row */
@@ -942,7 +1007,9 @@ a.badge:hover { background: var(--btn-hover-bg); color: var(--btn-hover-text); }
 
   .news__grid,
   .news__grid--3,
-  .contact__grid,
+  .contact__grid { grid-template-columns: repeat(2, 1fr); }
+
+  .videos { --per-view: 2; --arrow-gutter: 46px; }
   .videos__grid { grid-template-columns: repeat(2, 1fr); }
 }
 
@@ -971,7 +1038,12 @@ a.badge:hover { background: var(--btn-hover-bg); color: var(--btn-hover-text); }
 
   .news__grid,
   .news__grid--3,
-  .contact__grid,
+  .contact__grid { grid-template-columns: 1fr; }
+
+  /* a sliver of the next card shows that the row can be swiped —
+     the arrows are gone here, exactly like on the slider above */
+  .videos { --per-view: 1.15; --video-gap: 14px; --arrow-gutter: 0px; }
+  .videos__arrow { display: none; }
   .videos__grid { grid-template-columns: 1fr; }
 
   .vmodal { padding: 12px; }
