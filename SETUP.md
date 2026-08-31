@@ -27,6 +27,11 @@ That creates the three tables (`categories`, `articles`, `slides`), the security
 rules, the image storage bucket, and fills them with the content the site
 shows today — so nothing looks empty on the first run.
 
+Then repeat the same steps with `supabase/004-videos.sql`. That adds the
+`videos` table behind the **ვიდეოები** section of the admin panel and the
+“ვიდეო გალერეა” block on the homepage. Until you run it the panel simply says
+so and everything else keeps working.
+
 ## 3. Create your admin login
 
 1. Left menu → **Authentication** → **Users** → **Add user** → *Create new user*.
@@ -160,6 +165,7 @@ Sign in at `/admin/` with the email and password from step 3.
 | **დაფა** (Dashboard) | Counters and the most recently added articles |
 | **სიახლეები** (Articles) | Add, edit, delete, search and filter articles; publish/unpublish; put an article on the homepage |
 | **მთავარი გვერდი** (Homepage) | Choose the order of the “Latest News” articles, or remove one from the homepage |
+| **ვიდეოები** (Videos) | Add, edit, delete, reorder and hide the YouTube videos shown on the homepage |
 | **კატეგორიები** (Categories) | Add, rename, reorder, delete categories (the top menu is static HTML — see below) |
 | **სლაიდერი** (Slider) | Add, edit, delete, reorder and hide slider items |
 
@@ -175,6 +181,38 @@ Sign in at `/admin/` with the email and password from step 3.
 
 The article shows up instantly in its category page and, if you chose so, on the
 homepage. Nothing in the code has to change.
+
+### Adding a video
+
+**ვიდეოები** → **+ ახალი ვიდეო**
+
+1. Type the title.
+2. Paste the YouTube link. Any of these work — the panel reads the video out of
+   all of them and shows you underneath which one it recognised:
+
+   ```
+   https://www.youtube.com/watch?v=VIDEO_ID
+   https://youtu.be/VIDEO_ID
+   https://www.youtube.com/shorts/VIDEO_ID
+   https://www.youtube.com/embed/VIDEO_ID
+   <iframe src="https://www.youtube.com/embed/VIDEO_ID" …></iframe>
+   ```
+
+   On the website the video is embedded as
+   `https://www.youtube-nocookie.com/embed/VIDEO_ID` — the privacy-enhanced
+   YouTube domain, which sets no cookie until the visitor presses play. You
+   never write iframe code yourself.
+3. The **thumbnail** fills itself in with YouTube's own picture. To use your
+   own instead, press **ფაილის ატვირთვა** or paste an image address — an
+   uploaded picture is never overwritten when you change the link afterwards.
+4. **თანმიმდევრობა** is the position on the homepage; ↑ ↓ in the list change it too.
+5. **აქტიური** on = the video is visible on the website. Switch it off to hide
+   a video without deleting it.
+6. **შენახვა**.
+
+The video appears on the homepage straight away, under “ვიდეო გალერეა”.
+Visitors see the picture and the title; pressing the card opens the player.
+When no video is active the whole section disappears by itself.
 
 ### Adding a category
 
@@ -212,7 +250,9 @@ style.css             website styles
 js/config.js          ← the only file you edit (database address + key)
 js/api.js             all database calls, shared by site and admin
 js/common.js          shared helpers: mobile menu, news card
+js/youtube.js         reads a YouTube link → embed address + picture
 js/home.js            homepage
+js/videos.js          the "ვიდეო გალერეა" section + the player window
 js/article.js         article page
 js/category.js        category page
 js/analytics.js       GTM / GA4 — the "article_view" event
@@ -223,6 +263,7 @@ admin/admin.js        admin logic
 
 supabase/schema.sql   run once to create the database
 supabase/003-roles.sql  run once to turn on admin / author roles
+supabase/004-videos.sql run once to create the videos table
 images/               the original photos shipped with the site
 
 api/og.js             the picture + title Facebook shows for a shared link

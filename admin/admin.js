@@ -7,8 +7,9 @@
     5. Articles
     6. Latest news (homepage order + slider)
     7. Categories
-    8. Form pieces (image picker, text editor)
-    9. Drawer
+    8. Videos
+    9. Form pieces (image picker, text editor)
+   10. Drawer
    ============================================================ */
 
 /* ------------------------------------------------------------
@@ -132,7 +133,9 @@ $("logoutBtn").addEventListener("click", async () => {
 const state = {
   categories: [],
   articles: [],
+  videos: [],
   hasAuthor: true,
+  hasVideos: true,
   view: "dashboard",
 
   /* who is signed in — filled by loadAll() */
@@ -143,7 +146,7 @@ const state = {
 };
 
 /** Views only the admin may open. */
-const ADMIN_ONLY_VIEWS = ["home"];
+const ADMIN_ONLY_VIEWS = ["home", "videos"];
 
 const isAdmin = () => state.role === "admin";
 
@@ -160,19 +163,29 @@ const AUTHOR_MISSING_HINT = `
     გაუშვით <code>supabase/002-author-and-slider.sql</code>
     (Supabase → SQL Editor). მანამდე დანარჩენი ყველაფერი ჩვეულებრივ მუშაობს.</p>`;
 
+/** Shown while the videos table is still missing from the database. */
+const VIDEOS_MISSING_HINT = `
+  <p class="hint hint--warn">ვიდეოების ცხრილი ჯერ არ არის ბაზაში.
+    გაუშვით <code>supabase/004-videos.sql</code>
+    (Supabase → SQL Editor). მანამდე დანარჩენი ყველაფერი ჩვეულებრივ მუშაობს.</p>`;
+
 /** How many of the homepage articles also appear in the slider. */
 const SLIDER_COUNT = 7;
 
 async function loadAll() {
-  const [categories, articles, hasAuthor, profile] = await Promise.all([
+  const [categories, articles, hasAuthor, profile, videos] = await Promise.all([
     API.getCategories(),
     API.getArticles({ includeHidden: true }),
     API.hasColumn("articles", "author"),
-    API.getProfile()
+    API.getProfile(),
+    // null until 004-videos.sql is run — the rest of the panel keeps working
+    API.getVideos({ includeHidden: true }).catch(() => null)
   ]);
   state.categories = categories;
   state.articles   = articles;
   state.hasAuthor  = hasAuthor;   // false until 002-author-and-slider.sql is run
+  state.hasVideos  = videos !== null;
+  state.videos     = videos || [];
 
   // no profiles table yet → everyone keeps the full rights they had before
   state.hasRoles = !!profile;
@@ -215,11 +228,13 @@ const VIEW_TITLES = {
   dashboard:  "დაფა",
   articles:   "სიახლეები",
   home:       "მთავარი გვერდი",
+  videos:     "ვიდეოები",
   categories: "კატეგორიები"
 };
 
 const ADD_LABELS = {
   articles:   "+ ახალი სიახლე",
+  videos:     "+ ახალი ვიდეო",
   categories: "+ ახალი კატეგორია"
 };
 
@@ -247,6 +262,7 @@ document.querySelectorAll(".sidebar__link")
 
 $("topAddBtn").addEventListener("click", () => {
   if (state.view === "articles")   openArticleForm(null);
+  if (state.view === "videos")     openVideoForm(null);
   if (state.view === "categories") openCategoryForm(null);
 });
 
@@ -262,6 +278,7 @@ function render() {
   if (state.view === "dashboard")  renderDashboard();
   if (state.view === "articles")   renderArticles();
   if (state.view === "home")       renderHome();
+  if (state.view === "videos")     renderVideos();
   if (state.view === "categories") renderCategories();
 }
 
@@ -282,6 +299,7 @@ function renderDashboard() {
         ["დამალული",       state.articles.length - published],
         ["მთავარ გვერდზე", state.articles.filter(a => a.show_on_home && a.published).length],
         ["სლაიდერში",      Math.min(SLIDER_COUNT, homeArticles().filter(a => a.published).length)],
+        ["ვიდეო",          state.videos.filter(v => v.is_active).length],
         ["კატეგორია",      state.categories.length]
       ]
     : [
@@ -514,6 +532,80 @@ function removeCategory(id) {
   const extra = count ? `\n${count} სიახლე დარჩება, მაგრამ კატეგორიის გარეშე.` : "";
   if (!confirm(`წავშალოთ კატეგორია „${category.name}“?${extra}`)) return;
   save(() => API.deleteCategory(id), "კატეგორია წაიშალა");
+}
+
+
+/* ------------------------------------------------------------
+   8. Videos — the "ვიდეო გალერეა" section on the homepage
+      (js/videos.js reads exactly the same rows)
+   ------------------------------------------------------------ */
+
+function renderVideos() {
+  const list = state.videos;
+
+  // 004-videos.sql has not been run yet — say so instead of failing
+  if (!state.hasVideos) {
+    $("topAddBtn").hidden = true;
+    $("videoList").innerHTML = VIDEOS_MISSING_HINT;
+    return;
+  }
+
+  $("videoList").innerHTML = list.length
+    ? list.map((video, index) => {
+        const id    = YOUTUBE.videoId(video.embed_url || video.youtube_url);
+        const watch = YOUTUBE.watchUrl(id);
+        return `
+          <div class="row">
+            <img class="row__thumb row__thumb--wide" src="${previewSrc(YOUTUBE.thumbnailFor(video))}" alt=""
+                 onerror="this.src='${PLACEHOLDER}'" />
+
+            <div class="row__main">
+              <div class="row__title">${index + 1}. ${esc(video.title)}</div>
+              <div class="row__sub">
+                <span class="tag ${video.is_active ? "tag--green" : "tag--muted"}">
+                  ${video.is_active ? "ჩანს საიტზე" : "დამალულია — არ ჩანს"}</span>
+                ${id
+                  ? `<a href="${esc(watch)}" target="_blank" rel="noopener">YouTube ↗</a>`
+                  : `<span class="tag tag--yellow">ბმული ვერ ამოვიცანით</span>`}
+                <span>${formatDate(video.updated_at || video.created_at)}</span>
+              </div>
+            </div>
+
+            <div class="row__switches">
+              ${switchHTML("აქტიური", video.is_active,
+                `onchange="toggleVideo(${video.id}, this.checked)"`)}
+            </div>
+
+            <div class="row__actions">
+              <button class="icon-btn" title="ზემოთ" ${index === 0 ? "disabled" : ""}
+                      onclick="moveVideo(${video.id}, -1)">${ICON.up}</button>
+              <button class="icon-btn" title="ქვემოთ" ${index === list.length - 1 ? "disabled" : ""}
+                      onclick="moveVideo(${video.id}, 1)">${ICON.down}</button>
+              <button class="icon-btn" title="რედაქტირება"
+                      onclick="openVideoForm(${video.id})">${ICON.edit}</button>
+              <button class="icon-btn icon-btn--danger" title="წაშლა"
+                      onclick="removeVideo(${video.id})">${ICON.trash}</button>
+            </div>
+          </div>`;
+      }).join("")
+    : `<p class="empty">ვიდეოები ჯერ არ დაგიმატებიათ.<br>
+         დააჭირეთ „+ ახალი ვიდეო“ და ჩასვით YouTube-ის ბმული.</p>`;
+}
+
+function toggleVideo(id, value) {
+  save(() => API.updateVideo(id, { is_active: value }), "შენახულია");
+}
+
+function moveVideo(id, direction) {
+  reorder([...state.videos], id, direction, (video, index) =>
+    API.updateVideo(video.id, { sort_order: index + 1 }));
+}
+
+function removeVideo(id) {
+  const video = state.videos.find(v => v.id === id);
+  if (!confirm(`წავშალოთ ვიდეო „${video.title}"?
+მოქმედება შეუქცევადია.`)) return;
+  save(() => API.deleteVideo(id), "ვიდეო წაიშალა");
 }
 
 
@@ -793,6 +885,116 @@ function openArticleForm(id) {
     }
     return save(() => API.updateArticle(id, values), "ცვლილებები შენახულია");
   });
+}
+
+/* ---------- video form ---------- */
+
+/**
+ * Everything the admin has to do is paste a YouTube link. The embed
+ * address and the picture are worked out from it — see js/youtube.js.
+ */
+function openVideoForm(id) {
+  if (!state.hasVideos) { toast("ჯერ გაუშვით supabase/004-videos.sql", true); return; }
+
+  const video = state.videos.find(v => v.id === id) || {};
+  const isNew = !id;
+
+  const nextOrder = state.videos.length
+    ? Math.max(...state.videos.map(v => v.sort_order)) + 1
+    : 1;
+
+  const body = `
+    <label class="field">
+      <span class="field__label">სათაური *</span>
+      <input type="text" name="title" required value="${esc(video.title || "")}"
+             placeholder="მაგ. ტოპ 10 გოლი შემოდგომის ნაწილიდან" />
+    </label>
+
+    <label class="field">
+      <span class="field__label">YouTube-ის ბმული *</span>
+      <input type="text" name="youtube_url" required
+             value="${esc(video.youtube_url || video.embed_url || "")}"
+             placeholder="https://www.youtube.com/watch?v=VIDEO_ID" />
+      <span class="picker__note" id="videoUrlNote"></span>
+    </label>
+
+    <p class="hint">გამოდგება ნებისმიერი სახე: <code>youtube.com/watch?v=…</code>,
+      <code>youtu.be/…</code>, <code>/shorts/…</code>, მზა <code>/embed/…</code>
+      ან მთელი <code>&lt;iframe&gt;</code> კოდი — სისტემა თვითონ ამოიღებს ვიდეოს.
+      საიტზე ის ჩაშენდება <code>youtube-nocookie.com</code>-ით.</p>
+
+    <div class="field">
+      <span class="field__label">სურათი (thumbnail)</span>
+      ${pickerHTML("thumbnail_url", video.thumbnail_url)}
+      <span class="picker__note">ცარიელი რომ დატოვოთ, YouTube-ის საკუთარი სურათი გამოჩნდება.</span>
+    </div>
+
+    <div class="field-row">
+      <label class="field">
+        <span class="field__label">თანმიმდევრობა</span>
+        <input type="number" name="sort_order" min="1" step="1"
+               value="${isNew ? nextOrder : (video.sort_order ?? nextOrder)}" />
+      </label>
+
+      <div class="field">
+        <span class="field__label">ხილვადობა</span>
+        ${switchHTML("აქტიური — ჩანს საიტზე", isNew ? true : video.is_active, 'name="is_active"')}
+      </div>
+    </div>`;
+
+  openDrawer(isNew ? "ახალი ვიდეო" : "ვიდეოს რედაქტირება", body, data => {
+    const link  = data.get("youtube_url").trim();
+    const embed = YOUTUBE.embedUrl(link);
+
+    if (!embed) {
+      toast("YouTube-ის ბმული ვერ ამოვიცანით — შეამოწმეთ მისამართი.", true);
+      return false;
+    }
+
+    const values = {
+      title:         data.get("title").trim(),
+      youtube_url:   link,
+      embed_url:     embed,
+      thumbnail_url: data.get("thumbnail_url").trim(),
+      sort_order:    Number(data.get("sort_order")) || nextOrder,
+      is_active:     data.get("is_active") === "on"
+    };
+
+    return isNew
+      ? save(() => API.createVideo(values), "ვიდეო დაემატა")
+      : save(() => API.updateVideo(id, values), "ცვლილებები შენახულია");
+  });
+
+  wireVideoUrl($("drawerBody"));
+}
+
+/** Live feedback under the link field + YouTube's automatic picture. */
+function wireVideoUrl(root) {
+  const link    = root.querySelector('[name="youtube_url"]');
+  const note    = root.querySelector("#videoUrlNote");
+  const picker  = root.querySelector("[data-picker]");
+  const thumb   = picker.querySelector(".picker__url");
+  const preview = picker.querySelector(".picker__preview");
+
+  function sync() {
+    const value = link.value.trim();
+    const id    = YOUTUBE.videoId(value);
+    const bad   = !!value && !id;
+
+    note.textContent = id
+      ? "ჩაშენდება როგორც: " + YOUTUBE.EMBED_BASE + id
+      : (bad ? "ბმული ვერ ამოვიცანით — ჩასვით YouTube-ის მისამართი." : "");
+    note.classList.toggle("picker__note--warn", bad);
+
+    /* fill in YouTube's own picture, but never overwrite an uploaded one */
+    if (id && (!thumb.value.trim() || YOUTUBE.isAutoThumbnail(thumb.value))) {
+      thumb.value = YOUTUBE.thumbnailUrl(id);
+      preview.src = thumb.value;
+    }
+  }
+
+  link.addEventListener("input", sync);
+  sync();
 }
 
 /* ---------- category form ---------- */

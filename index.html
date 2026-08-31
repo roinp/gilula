@@ -125,6 +125,32 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     </div>
   </section>
 
+  <!-- ============ VIDEOS ============ -->
+  <!-- Managed from the admin panel ("ვიდეოები") — see js/videos.js.
+       Stays hidden until the database answers with at least one active video. -->
+  <section class="videos section" id="videos" hidden>
+    <div class="container">
+
+      <div class="section__head">
+        <h2 class="section__title">ვიდეო <span class="accent">გალერეა</span></h2>
+        <p class="section__subtitle">საუკეთესო მომენტები, ინტერვიუები და მიმოხილვები</p>
+      </div>
+
+      <div class="videos__grid" id="videosGrid"></div>
+
+    </div>
+  </section>
+
+  <!-- the YouTube player opens here; the iframe is built only on click -->
+  <div class="vmodal" id="videoModal" hidden>
+    <div class="vmodal__backdrop" data-close></div>
+    <div class="vmodal__box" role="dialog" aria-modal="true" aria-labelledby="videoModalTitle">
+      <button type="button" class="vmodal__close" data-close aria-label="დახურვა">&times;</button>
+      <div class="vmodal__frame" id="videoFrame"></div>
+      <h3 class="vmodal__title" id="videoModalTitle"></h3>
+    </div>
+  </div>
+
   <!-- ============ CONTACT ============ -->
   <section class="contact section" id="contact">
     <div class="container">
@@ -196,7 +222,9 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   <script src="js/config.js"></script>
   <script src="js/api.js"></script>
   <script src="js/common.js"></script>
+  <script src="js/youtube.js"></script>
   <script src="js/home.js"></script>
+  <script src="js/videos.js"></script>
 
   <script src="js/translate.js"></script>
   <script src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit" async></script>

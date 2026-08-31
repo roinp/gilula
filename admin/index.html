@@ -78,6 +78,10 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         <svg viewBox="0 0 24 24"><path d="M12 3 2 12h3v8h6v-5h2v5h6v-8h3L12 3z"/></svg>
         მთავარი გვერდი
       </button>
+      <button class="sidebar__link" data-view="videos">
+        <svg viewBox="0 0 24 24"><path d="M4 5h11a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2zm15 4.6 3-2.1v9l-3-2.1V9.6z"/></svg>
+        ვიდეოები
+      </button>
       <button class="sidebar__link" data-view="categories">
         <svg viewBox="0 0 24 24"><path d="M3 5h8v6H3V5zm10 0h8v6h-8V5zM3 13h8v6H3v-6zm10 0h8v6h-8v-6z"/></svg>
         კატეგორიები
@@ -136,6 +140,14 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         <div class="panel" id="homeList"></div>
       </section>
 
+      <!-- ===== videos ===== -->
+      <section class="view" data-view="videos">
+        <p class="hint">აქ დამატებული ვიდეოები მაშინვე ჩნდება მთავარ გვერდზე, სექციაში „ვიდეო გალერეა“.
+          ჩასვით YouTube-ის ბმული — დანარჩენს (ჩაშენება და სურათი) სისტემა თვითონ აწყობს.
+          ისრებით შეცვალეთ თანმიმდევრობა, გადამრთველით — დამალეთ ვიდეო წაშლის გარეშე.</p>
+        <div class="panel" id="videoList"></div>
+      </section>
+
       <!-- ===== categories ===== -->
       <section class="view" data-view="categories">
         <p class="hint">კატეგორია მაშინვე მუშაობს — სიახლის დამატებისას შეგიძლიათ აირჩიოთ და მისი გვერდიც იხსნება.
@@ -176,6 +188,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="../js/config.js"></script>
 <script src="../js/api.js"></script>
+<script src="../js/youtube.js"></script>
 <script src="admin.js"></script>
 </body>
 </html>

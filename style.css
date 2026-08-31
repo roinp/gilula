@@ -664,6 +664,188 @@ body { top: 0 !important; }
 a.badge { transition: background .2s, color .2s; }
 a.badge:hover { background: var(--btn-hover-bg); color: var(--btn-hover-text); }
 
+/* ---------- 7c. Videos ---------- */
+/* The cards are filled from the `videos` table (admin panel → „ვიდეოები“).
+   Each card is a button: pressing it opens the YouTube player in .vmodal. */
+
+.videos__grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+}
+
+.video-card {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  padding: 0;
+  font: inherit;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  transition: transform .25s, border-color .25s;
+}
+.video-card:hover { transform: translateY(-6px); border-color: var(--green); }
+.video-card:focus-visible { outline: 2px solid var(--green); outline-offset: 3px; }
+
+.video-card__thumb {
+  position: relative;
+  display: block;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  background: var(--photo-bg);
+}
+
+.video-card__img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform .4s;
+}
+.video-card:hover .video-card__img { transform: scale(1.06); }
+
+/* same dark veil as the news cards, so the play button always reads */
+.video-card__thumb::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: var(--thumb-veil);
+}
+
+.video-card__play {
+  position: absolute;
+  z-index: 1;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 64px;
+  height: 64px;
+  display: grid;
+  place-items: center;
+  border: 2px solid var(--green);
+  border-radius: 999px;
+  background: rgba(10, 10, 10, .55);
+  box-shadow: var(--shadow-badge);
+  transition: background .25s, transform .25s;
+}
+.video-card__play svg {
+  width: 26px;
+  height: 26px;
+  margin-left: 3px; /* optical centring of the triangle */
+  fill: var(--green);
+  transition: fill .25s;
+}
+.video-card:hover .video-card__play { background: var(--green); transform: translate(-50%, -50%) scale(1.08); }
+.video-card:hover .video-card__play svg { fill: var(--on-green); }
+
+.video-card__body {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  gap: 10px;
+  padding: 16px;
+}
+.video-card__title {
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 1.4;
+  transition: color .2s;
+}
+.video-card:hover .video-card__title { color: var(--green-text); }
+
+.video-card__meta {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: auto;
+  padding-top: 12px;
+  border-top: 1px solid var(--border);
+  font-size: 12px;
+  color: var(--muted);
+}
+.video-card__meta svg { width: 14px; height: 14px; fill: var(--green-text); }
+
+/* ---------- 7d. Video player window ---------- */
+/* The <iframe> is created on click and removed on close (js/videos.js),
+   so nothing plays in the background and YouTube is contacted only
+   once the visitor asks for it. */
+
+.vmodal {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.vmodal__backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, .82);
+}
+
+.vmodal__box {
+  position: relative;
+  width: 100%;
+  max-width: 960px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  box-shadow: var(--shadow-photo);
+  animation: vmodal-in .2s ease;
+}
+
+@keyframes vmodal-in {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: none; }
+}
+
+.vmodal__frame {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  background: #000;
+}
+.vmodal__frame iframe {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+
+.vmodal__title {
+  padding: 16px 18px;
+  font-size: 17px;
+  font-weight: 500;
+}
+
+.vmodal__close {
+  position: absolute;
+  z-index: 2;
+  top: 10px;
+  right: 12px;
+  width: 38px;
+  height: 38px;
+  font-size: 24px;
+  line-height: 1;
+  cursor: pointer;
+  color: var(--text);
+  background: rgba(10, 10, 10, .75);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  transition: color .2s, border-color .2s, background .2s;
+}
+.vmodal__close:hover { color: var(--green-text); border-color: var(--green); background: var(--black); }
+
 /* ---------- 8. Contact ---------- */
 .contact { background: var(--black-soft); border-top: 1px solid var(--border); }
 
@@ -760,7 +942,8 @@ a.badge:hover { background: var(--btn-hover-bg); color: var(--btn-hover-text); }
 
   .news__grid,
   .news__grid--3,
-  .contact__grid { grid-template-columns: repeat(2, 1fr); }
+  .contact__grid,
+  .videos__grid { grid-template-columns: repeat(2, 1fr); }
 }
 
 /* phone: single column */
@@ -788,7 +971,11 @@ a.badge:hover { background: var(--btn-hover-bg); color: var(--btn-hover-text); }
 
   .news__grid,
   .news__grid--3,
-  .contact__grid { grid-template-columns: 1fr; }
+  .contact__grid,
+  .videos__grid { grid-template-columns: 1fr; }
+
+  .vmodal { padding: 12px; }
+  .vmodal__title { font-size: 15px; padding: 14px; }
 
   .footer__inner { justify-content: center; text-align: center; }
 }

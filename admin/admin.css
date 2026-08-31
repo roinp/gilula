@@ -415,6 +415,13 @@ svg  { width: 20px; height: 20px; fill: currentColor; flex: none; }
   background: linear-gradient(135deg, #0d3d24, #0a0a0a);
 }
 
+/* video rows — YouTube pictures are 16:9 */
+.row__thumb--wide { width: 86px; }
+
+/* the YouTube link of a video row */
+.row__sub a { color: var(--green); }
+.row__sub a:hover { text-decoration: underline; }
+
 /* marks where the slider stops and the plain news list begins */
 .row--slider-edge { border-bottom: 2px solid rgba(0, 224, 90, .45); }
 
@@ -519,6 +526,10 @@ svg  { width: 20px; height: 20px; fill: currentColor; flex: none; }
 .picker__url:focus { border-color: var(--green); }
 .picker__actions { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
 .picker__note { font-size: 12px; color: var(--muted); }
+
+/* the same note used on its own under a field (video link, thumbnail) */
+.field > .picker__note { display: block; margin-top: 6px; }
+.picker__note--warn { color: var(--yellow); }
 
 /* rich text editor */
 .editor { background: var(--bg); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }

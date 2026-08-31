@@ -104,6 +104,36 @@
       return !error;
     },
 
+    /* ---------- videos ---------- */
+
+    /**
+     * @param {object}  o
+     * @param {boolean} o.includeHidden  admin view — also return disabled videos
+     * @param {number}  o.limit
+     */
+    getVideos(o = {}) {
+      let q = sb.from("videos").select("*");
+
+      if (!o.includeHidden) q = q.eq("is_active", true);
+
+      q = q.order("sort_order", { ascending: true }).order("id", { ascending: true });
+
+      if (o.limit) q = q.limit(o.limit);
+      return run(q);
+    },
+
+    createVideo(values) {
+      return run(sb.from("videos").insert(values).select().single());
+    },
+
+    updateVideo(id, values) {
+      return run(sb.from("videos").update(values).eq("id", id).select().single());
+    },
+
+    deleteVideo(id) {
+      return run(sb.from("videos").delete().eq("id", id));
+    },
+
     /* ---------- image upload ---------- */
 
     /** Uploads a file to the public "media" bucket and returns its URL. */
