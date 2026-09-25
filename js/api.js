@@ -1,5 +1,5 @@
 /* ============================================================
-   GILULA SPORT — data layer
+   ARENA — data layer
    ------------------------------------------------------------
    One small wrapper around Supabase, shared by the public
    website and the admin panel, so both always read and write

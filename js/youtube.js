@@ -1,5 +1,5 @@
 /* ============================================================
-   GILULA SPORT — YouTube helpers
+   ARENA — YouTube helpers
    ------------------------------------------------------------
    Shared by the website and the admin panel, so both understand
    exactly the same set of links.

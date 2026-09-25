@@ -1,5 +1,5 @@
 /* ============================================================
-   GILULA SPORT — category page
+   ARENA — category page
 
    The menu links here by name:   category.html?name=ფეხბურთი
    so the navbar stays plain HTML and never depends on database ids.
@@ -38,7 +38,7 @@ async function renderCategory() {
       return;
     }
 
-    document.title = `${name} — GILULA SPORT`;
+    document.title = `${name} — ARENA`;
     categoryTitle.innerHTML = `<span class="accent">${esc(name)}</span>`;
     markActiveNav(name);
 

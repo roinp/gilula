@@ -1,5 +1,5 @@
 /* ============================================================
-   GILULA SPORT — helpers shared by every public page
+   ARENA — helpers shared by every public page
    1. Small utilities
    2. Mobile menu
    3. Navbar categories (loaded from the database)

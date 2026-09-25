@@ -1,5 +1,5 @@
 /* ============================================================
-   GILULA SPORT — single article page  (article.html?id=…)
+   ARENA — single article page  (article.html?id=…)
    ============================================================ */
 
 const articleId  = new URLSearchParams(location.search).get("id");
@@ -10,7 +10,7 @@ async function renderArticle() {
     const article  = await API.getArticle(articleId);
     const category = article.categories;
 
-    document.title = `${article.title} — GILULA SPORT`;
+    document.title = `${article.title} — ARENA`;
     if (category) markActiveNav(category.name);
 
     // GTM / GA4 — "article_view", see js/analytics.js.

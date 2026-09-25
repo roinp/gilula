@@ -1,5 +1,5 @@
 /* ============================================================
-   GILULA SPORT — GTM / GA4 tracking
+   ARENA — GTM / GA4 tracking
    ------------------------------------------------------------
    Pushes the "article_view" event into window.dataLayer on every
    article page, so Google Tag Manager can forward the article

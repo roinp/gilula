@@ -1,5 +1,5 @@
 /* ============================================================
-   GILULA SPORT — Open Graph for social networks
+   ARENA — Open Graph for social networks
    ------------------------------------------------------------
    Facebook, Messenger, WhatsApp, Telegram, Twitter/X, LinkedIn …
    do NOT run JavaScript. They only read the raw HTML that the
@@ -29,9 +29,9 @@
    og:url points every share at this address instead. Change it here if
    the domain ever changes (or set SITE_URL in Vercel → Settings →
    Environment Variables). */
-const SITE_URL = (process.env.SITE_URL || "https://gilula.ge").replace(/\/+$/, "");
+const SITE_URL = (process.env.SITE_URL || "https://arenageo.ge").replace(/\/+$/, "");
 
-const FALLBACK_TITLE = "GILULA SPORT";
+const FALLBACK_TITLE = "ARENA";
 const FALLBACK_DESC =
   "ქართული და მსოფლიო სპორტის უახლესი სიახლეები: ფეხბურთი, კალათბურთი, რაგბი, MMA და სხვა.";
 
@@ -257,7 +257,7 @@ function head(meta) {
 <meta name="description" content="${esc(meta.description)}" />
 
 <meta property="og:type" content="${esc(meta.type)}" />
-<meta property="og:site_name" content="GILULA SPORT" />
+<meta property="og:site_name" content="ARENA" />
 <meta property="og:locale" content="ka_GE" />
 <meta property="og:url" content="${esc(meta.url)}" />
 <meta property="og:title" content="${esc(meta.cardTitle)}" />
@@ -315,7 +315,7 @@ ${head(meta)}
 <body>
 <h1>${esc(meta.cardTitle)}</h1>
 <p>${esc(meta.description)}</p>
-<p><a href="${esc(SITE_URL)}/">GILULA SPORT</a></p>
+<p><a href="${esc(SITE_URL)}/">ARENA</a></p>
 </body>
 </html>`;
 }
@@ -335,7 +335,7 @@ module.exports = async (req, res) => {
     title: FALLBACK_TITLE,       // browser tab
     cardTitle: FALLBACK_TITLE,   // the bold line on the Facebook card
     description: FALLBACK_DESC,
-    image: `${SITE_URL}/logo.jpg`,
+    image: `${SITE_URL}/logo.jpeg`,
     imageWidth: "",
     imageHeight: "",
     imageType: "",
@@ -354,8 +354,8 @@ module.exports = async (req, res) => {
 
   if (found) {
     meta.type = "article";
-    meta.title = `${found.title} — GILULA SPORT`;
-    // og:site_name already says GILULA SPORT, so the card keeps the plain title
+    meta.title = `${found.title} — ARENA`;
+    // og:site_name already says ARENA, so the card keeps the plain title
     meta.cardTitle = found.title;
     meta.description =
       plain(found.excerpt, 300) || plain(found.content, 300) || FALLBACK_DESC;

@@ -1,5 +1,5 @@
 -- ============================================================
---  GILULA SPORT — database schema
+--  ARENA — database schema
 --  Run this once in Supabase → SQL Editor → New query → Run
 -- ============================================================
 
@@ -102,7 +102,7 @@ insert into categories (name, sort_order) values
 on conflict (name) do nothing;
 
 insert into articles (title, author, excerpt, content, image_url, image_fit, category_id, home_order, read_time, published_at)
-select v.title, 'GILULA SPORT', v.excerpt, '<p>' || v.excerpt || '</p>', v.image_url, v.image_fit,
+select v.title, 'ARENA', v.excerpt, '<p>' || v.excerpt || '</p>', v.image_url, v.image_fit,
        (select id from categories c where c.name = v.category),
        v.home_order, v.read_time, v.published_at::timestamptz
 from (values

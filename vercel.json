@@ -6,7 +6,7 @@
       "has": [
         {
           "type": "host",
-          "value": "gilula.vercel.app"
+          "value": "^(gilula\\.vercel\\.app|gilula\\.ge|www\\.gilula\\.ge|www\\.arenageo\\.ge)$"
         }
       ],
       "dest": "/api/canonical"

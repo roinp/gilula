@@ -1,4 +1,4 @@
-# GILULA SPORT — setup guide
+# ARENA — setup guide
 
 The website and the admin panel share one free **Supabase** database
 (free forever tier: 500 MB database + 1 GB image storage + login system).
@@ -396,7 +396,7 @@ keeps looking empty in Messenger too until you scrape it again here.
 Facebook wants at least **200 × 200 px**, and shows the big card only from about
 **600 × 315 px**. `1200 × 630` is the safest size. A picture smaller than that
 still shares, it just gets the small square card. Articles with no featured
-image fall back to `logo.jpg`.
+image fall back to `logo.jpeg`.
 
 **Upload pictures at least 1200 px wide.** Everything else is handled for you —
 `api/og.js` asks Supabase for a 1200 px copy — but nothing can enlarge a picture
@@ -421,7 +421,7 @@ scrape them again (see above).
 
 ### The tab icon
 
-`logo.jpg` is the picture in the browser tab, wired up in the `<head>` of every
+`logo.jpeg` is the picture in the browser tab, wired up in the `<head>` of every
 page. If you replace the file, keep the name.
 
 ## Troubleshooting

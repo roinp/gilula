@@ -1,5 +1,5 @@
 /* ============================================================
-   GILULA SPORT — videos section
+   ARENA — videos section
 
    Everything shown here comes from the `videos` table, which is
    filled from the admin panel („ვიდეოები“). Nothing is written

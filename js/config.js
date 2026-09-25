@@ -1,5 +1,5 @@
 /* ============================================================
-   GILULA SPORT — database connection settings
+   ARENA — database connection settings
    ------------------------------------------------------------
    Both values come from your Supabase project:
    Supabase → Project Settings → API

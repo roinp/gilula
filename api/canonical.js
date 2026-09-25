@@ -1,5 +1,5 @@
 /* ============================================================
-   GILULA SPORT — one address, not two
+   ARENA — one address, not two
    ------------------------------------------------------------
    The site answers on its own name and on the Vercel one. That
    is one page living at two addresses, and it shows: Facebook
@@ -15,7 +15,7 @@
    are left alone, so they keep working as before.
    ============================================================ */
 
-const SITE_URL = (process.env.SITE_URL || "https://gilula.ge").replace(/\/+$/, "");
+const SITE_URL = (process.env.SITE_URL || "https://arenageo.ge").replace(/\/+$/, "");
 
 module.exports = (req, res) => {
   const host = req.headers["x-forwarded-host"] || req.headers.host || "";

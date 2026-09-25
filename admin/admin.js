@@ -1,5 +1,5 @@
 /* ============================================================
-   GILULA SPORT — admin panel
+   ARENA — admin panel
     1. Helpers
     2. Login
     3. Loading & navigation

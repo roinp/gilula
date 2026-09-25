@@ -1,5 +1,5 @@
 /* ============================================================
-   GILULA SPORT — homepage
+   ARENA — homepage
 
    The slider and the news grid come from the SAME list of
    articles, so content is entered only once in the admin panel:
