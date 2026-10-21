@@ -967,6 +967,51 @@ a.badge:hover { background: var(--btn-hover-bg); color: var(--btn-hover-text); }
 .footer__admin { color: var(--green-text); }
 .footer__admin:hover { text-decoration: underline; }
 
+/* ---------- 9b. Side banners ---------- */
+/* 160 × 600 banners pinned in the empty space beside the container.
+   From 1180px up they are shown; below 1640px there is not enough room
+   beside a 1240px container, so the content (not the header) narrows to
+   100vw − 2 × (160 banner + 20 gap + 20 edge). Below 1180px they stay hidden. */
+.side-ad {
+  display: none;
+  position: fixed;
+  top: calc(var(--header-h) + 24px);
+  z-index: 10;
+  width: 160px;
+}
+.side-ad--left  { right: calc(50% + var(--container) / 2 + 20px); }
+.side-ad--right { left:  calc(50% + var(--container) / 2 + 20px); }
+.side-ad img { width: 160px; height: 600px; object-fit: cover; border-radius: 6px; }
+
+@media (min-width: 1180px) and (min-height: 720px) {
+  body.has-side-ads > :not(.header) { --container: min(1240px, calc(100vw - 400px)); }
+  .side-ad { display: block; }
+}
+
+/* with the banners in, the content is 1040px or narrower below 1440px —
+   too tight for 4 cards per row, so drop to 3 like the laptop layout */
+@media (min-width: 1180px) and (max-width: 1439px) and (min-height: 720px) {
+  .has-side-ads .news__grid,
+  .has-side-ads .contact__grid { grid-template-columns: repeat(3, 1fr); }
+
+  .has-side-ads .videos { --per-view: 3; --arrow-gutter: 52px; }
+  .has-side-ads .videos__grid { grid-template-columns: repeat(3, 1fr); }
+}
+
+/* 320 × 100 banner under the slider — phones and tablets only.
+   The [hidden] rule keeps it away until js/common.js fills it. */
+.mobile-ad {
+  display: none;
+  width: calc(100% - 24px);
+  max-width: 320px;
+  margin: 0 auto 8px;
+}
+.mobile-ad img { width: 100%; height: auto; border-radius: 8px; }
+
+@media (max-width: 900px) {
+  .mobile-ad { display: block; }
+}
+
 /* ============================================================
    10. Responsive
    ============================================================ */

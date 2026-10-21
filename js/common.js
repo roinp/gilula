@@ -4,6 +4,7 @@
    2. Mobile menu
    3. Navbar categories (loaded from the database)
    4. Footer year
+   5. Side banners
    ============================================================ */
 
 /* ---------- 1. Small utilities ---------- */
@@ -108,3 +109,40 @@ markActiveNav();
 
 const yearEl = document.getElementById("year");
 if (yearEl) yearEl.textContent = new Date().getFullYear();
+
+/* ---------- 5. Banners ---------- */
+/* Filled from SIDE_ADS and MOBILE_AD in js/config.js.
+   CSS decides on which screen sizes each one is visible. */
+
+const adConfig = window.GILULA_CONFIG || {};
+
+/** Banner image, wrapped in a link when the ad has one. */
+function adHtml(ad, width, height) {
+  const img = `<img src="${esc(ad.image)}" alt="რეკლამა" width="${width}" height="${height}" loading="lazy" />`;
+  return ad.link
+    ? `<a href="${esc(ad.link)}" target="_blank" rel="noopener sponsored">${img}</a>`
+    : img;
+}
+
+const sideAds = adConfig.SIDE_ADS || {};
+
+["left", "right"].forEach(side => {
+  const ad = sideAds[side];
+  if (!ad || !ad.image) return;
+
+  const banner = document.createElement("aside");
+  banner.className = `side-ad side-ad--${side}`;
+  banner.innerHTML = adHtml(ad, 160, 600);
+  document.body.appendChild(banner);
+  // lets style.css narrow the content to make room for the banners
+  document.body.classList.add("has-side-ads");
+});
+
+// only the homepage has the slot under the slider
+const mobileAdEl = document.getElementById("mobileAd");
+const mobileAd   = adConfig.MOBILE_AD;
+
+if (mobileAdEl && mobileAd && mobileAd.image) {
+  mobileAdEl.innerHTML = adHtml(mobileAd, 320, 100);
+  mobileAdEl.hidden = false;
+}
