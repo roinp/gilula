@@ -81,7 +81,8 @@ const ICON = {
   edit:  `<svg viewBox="0 0 24 24"><path d="M3 17.25V21h3.75L17.8 9.94l-3.75-3.75L3 17.25zM20.7 7.04a1 1 0 0 0 0-1.41l-2.34-2.34a1 1 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>`,
   trash: `<svg viewBox="0 0 24 24"><path d="M6 19a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>`,
   up:    `<svg viewBox="0 0 24 24"><path d="m12 8-6 6h12l-6-6z"/></svg>`,
-  down:  `<svg viewBox="0 0 24 24"><path d="m12 16 6-6H6l6 6z"/></svg>`
+  down:  `<svg viewBox="0 0 24 24"><path d="m12 16 6-6H6l6 6z"/></svg>`,
+  share: `<svg viewBox="0 0 24 24"><path d="M17.65 6.35A7.95 7.95 0 0 0 12 4a8 8 0 1 0 7.73 10h-2.08A6 6 0 1 1 12 6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/></svg>`
 };
 
 
@@ -348,6 +349,19 @@ $("articleSearch").addEventListener("input", renderArticles);
 $("articleFilter").addEventListener("change", renderArticles);
 $("onlyMine").addEventListener("change", renderArticles);
 
+/* Facebook remembers the card (picture, title) of every link it has seen
+   and does not look again by itself. After the picture or the title of
+   an article changes, Facebook has to be told to read the page again —
+   its "Sharing Debugger" does that with the "Scrape Again" button.
+   The address must be the site's real one: that is what og:url says. */
+function refreshFacebookCard(id) {
+  const link = `https://arenageo.ge/article.html?id=${encodeURIComponent(id)}`;
+  window.open(
+    "https://developers.facebook.com/tools/debug/?q=" + encodeURIComponent(link),
+    "_blank", "noopener"
+  );
+}
+
 function renderArticles() {
   /* keep the category filter in sync with the categories table */
   const filter = $("articleFilter");
@@ -396,6 +410,8 @@ function renderArticles() {
             ${mine ? `
               <button class="icon-btn" title="რედაქტირება"
                       onclick="openArticleForm(${article.id})">${ICON.edit}</button>
+              <button class="icon-btn" title="Facebook-ის ბარათის განახლება (ფოტოს ან სათაურის შეცვლის შემდეგ)"
+                      onclick="refreshFacebookCard(${article.id})">${ICON.share}</button>
               <button class="icon-btn icon-btn--danger" title="წაშლა"
                       onclick="removeArticle(${article.id})">${ICON.trash}</button>` : ""}
           </div>

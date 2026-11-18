@@ -44,11 +44,36 @@ function requireDatabase(container) {
   return false;
 }
 
+/* Facebook (and Messenger, WhatsApp, Telegram …) remember the card of a
+   link — picture, title, description — under the link's exact address,
+   and do not look again for weeks. So the address itself carries a short
+   stamp, "&v=…", worked out from those three things: change the picture
+   and the stamp changes, the address is one Facebook has never seen, and
+   it reads the page afresh.
+
+   api/og.js works the very same stamp out on the server (cardVersion
+   there) — the two must stay identical, letter for letter. */
+function cardVersion(article) {
+  const text = [article.image_url, article.title, article.excerpt]
+    .map(value => String(value == null ? "" : value)).join("|");
+
+  let hash = 5381;
+  for (let i = 0; i < text.length; i++) {
+    hash = (((hash << 5) + hash) ^ text.charCodeAt(i)) >>> 0;
+  }
+  return hash.toString(36);
+}
+
+/** The address of an article, stamp included. */
+function articleUrl(article) {
+  return `article.html?id=${article.id}&v=${cardVersion(article)}`;
+}
+
 /** One news card — used on the homepage and on category pages. */
 function articleCard(article) {
   const category = article.categories ? article.categories.name : "";
   return `
-    <a href="article.html?id=${article.id}" class="card">
+    <a href="${articleUrl(article)}" class="card">
       <div class="card__thumb">
         <img src="${imageOr(article.image_url)}" alt="${esc(article.title)}"
              class="card__img ${article.image_fit === "contain" ? "card__img--contain" : ""}"

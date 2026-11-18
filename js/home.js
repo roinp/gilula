@@ -37,7 +37,7 @@ function renderSlider(articles) {
             <h2 class="slide__title">${esc(article.title)}</h2>
             <p class="slide__role">${byline}</p>
             ${article.excerpt ? `<p class="slide__desc">${esc(article.excerpt)}</p>` : ""}
-            <a href="article.html?id=${article.id}" class="btn">სრულად ნახვა</a>
+            <a href="${articleUrl(article)}" class="btn">სრულად ნახვა</a>
           </div>
           <div class="slide__visual${article.image_url ? "" : " no-photo"}">
             ${article.image_url

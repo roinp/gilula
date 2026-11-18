@@ -80,6 +80,25 @@ function firstImageIn(html) {
   return match ? match[1] : "";
 }
 
+/* Facebook remembers a card under the link's exact address and does not
+   look again for weeks — a changed picture never reached the card. So
+   the address carries a short stamp, "&v=…", worked out from the picture,
+   the title and the description: when one of them changes, so does the
+   address, and Facebook reads the page afresh.
+
+   js/common.js works the very same stamp out in the browser (cardVersion
+   there) — the two must stay identical, letter for letter. */
+function cardVersion(article) {
+  const text = [article.image_url, article.title, article.excerpt]
+    .map((value) => String(value == null ? "" : value)).join("|");
+
+  let hash = 5381;
+  for (let i = 0; i < text.length; i++) {
+    hash = (((hash << 5) + hash) ^ text.charCodeAt(i)) >>> 0;
+  }
+  return hash.toString(36);
+}
+
 /* Facebook and Messenger cannot draw a WebP picture — the card comes up
    with an empty grey box instead. Supabase can hand the very same file
    over as a JPEG: its "render/image" address resizes the picture and
@@ -253,7 +272,7 @@ async function fetchArticle(id, origin) {
 /** The <head> block: the tab title plus every social-network tag. */
 function head(meta) {
   return `<title>${esc(meta.title)}</title>
-<link rel="canonical" href="${esc(meta.url)}" />
+<link rel="canonical" href="${esc(meta.canonical)}" />
 <meta name="description" content="${esc(meta.description)}" />
 
 <meta property="og:type" content="${esc(meta.type)}" />
@@ -331,7 +350,8 @@ module.exports = async (req, res) => {
 
   const meta = {
     type: "website",
-    url,
+    url,                         // og:url — gets the "&v=" stamp below
+    canonical: url,              // for Google: one address, no stamp
     title: FALLBACK_TITLE,       // browser tab
     cardTitle: FALLBACK_TITLE,   // the bold line on the Facebook card
     description: FALLBACK_DESC,
@@ -354,6 +374,7 @@ module.exports = async (req, res) => {
 
   if (found) {
     meta.type = "article";
+    meta.url = `${url}&v=${cardVersion(found)}`;
     meta.title = `${found.title} — ARENA`;
     // og:site_name already says ARENA, so the card keeps the plain title
     meta.cardTitle = found.title;
@@ -378,9 +399,10 @@ module.exports = async (req, res) => {
   const body = staticHtml ? inject(staticHtml, meta) : barePage(meta);
 
   res.setHeader("Content-Type", "text/html; charset=utf-8");
-  res.setHeader(
-    "Cache-Control",
-    "public, max-age=0, s-maxage=300, stale-while-revalidate=86400"
-  );
+  // Kept for one minute only, and never served stale. With the old
+  // "stale-while-revalidate=86400" an article whose picture had just been
+  // changed could keep answering with the OLD og:image for hours — and
+  // that old answer is exactly what Facebook read when it re-scraped.
+  res.setHeader("Cache-Control", "public, max-age=0, s-maxage=60");
   res.status(200).send(body);
 };

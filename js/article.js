@@ -10,6 +10,16 @@ async function renderArticle() {
     const article  = await API.getArticle(articleId);
     const category = article.categories;
 
+    // The address bar always shows the article's current stamp (see
+    // cardVersion in js/common.js), so a link copied from here is one
+    // Facebook reads afresh after the picture has been changed.
+    const stamped = new URL(location.href);
+    if (typeof cardVersion === "function" &&
+        stamped.searchParams.get("v") !== cardVersion(article)) {
+      stamped.searchParams.set("v", cardVersion(article));
+      history.replaceState(history.state, "", stamped);
+    }
+
     document.title = `${article.title} — ARENA`;
     if (category) markActiveNav(category.name);
 

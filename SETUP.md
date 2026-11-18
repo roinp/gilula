@@ -380,12 +380,26 @@ would rather keep them in Vercel → *Settings* → *Environment Variables* as
 
 ### After you publish a change
 
-Facebook remembers the first thing it saw about a link, sometimes for weeks. To
-force a fresh look:
+Facebook remembers the first thing it saw about a link, sometimes for weeks —
+under the link's exact address. That is why a changed picture used to stay old
+on the card.
 
-1. Open <https://developers.facebook.com/tools/debug/>
-2. Paste the article address (`https://your-site/article.html?id=15`)
-3. Press **Scrape Again** — the picture appears.
+So the address of an article carries a short stamp, `&v=…`, worked out from
+the picture, the title and the description (`cardVersion` in `js/common.js`
+and, identically, in `api/og.js`). Change the picture and the stamp changes:
+the address is one Facebook has never seen, so it reads the page afresh. The
+links on the site carry the stamp, and the article page puts the current one
+into the address bar by itself. **Nothing to set up** — after editing an
+article, open it on the site and copy the address from the address bar.
+
+Two things the stamp cannot do:
+
+- A post that is **already on Facebook** keeps the picture it was posted with.
+  Share the article again (or try *Refresh share attachment* in the post's menu).
+- An address **without** the stamp (`article.html?id=15`, typed by hand or
+  copied before this change) is still remembered the old way. The round-arrow
+  button next to an article in the admin panel opens Facebook's Sharing
+  Debugger for it — press **Scrape Again** there.
 
 You only need this for links Facebook has already seen. Messenger shows the very
 same card, out of the very same memory, so a link that was shared before the fix
