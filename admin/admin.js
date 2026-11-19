@@ -29,6 +29,13 @@ const PLACEHOLDER =
   "data:image/svg+xml,%3Csvg%20xmlns=%22http://www.w3.org/2000/svg%22%20viewBox=%220%200%2024%2024%22%20fill=%22none%22%20stroke=%22%2300e05a%22%20stroke-width=%22.7%22%3E%3Ccircle%20cx=%2212%22%20cy=%2212%22%20r=%2210%22/%3E%3Cpath%20d=%22M12%206.5l4.2%203-1.6%205h-5.2l-1.6-5z%22/%3E%3Cpath%20d=%22M12%202v4.5M2.4%209.2l5%201.3M21.6%209.2l-5%201.3M6%2021l3.4-6.5M18%2021l-3.4-6.5%22/%3E%3C/svg%3E";
 
 /** The admin lives in /admin/, so site-relative paths need one level up. */
+/** src for a small list thumbnail — a 320 px copy instead of the original. */
+function thumbAttrs(url) {
+  const src   = previewSrc(url);
+  const small = imgUrl(src, 320);
+  return small === src ? `src="${src}"` : `src="${small}" data-orig="${src}"`;
+}
+
 function previewSrc(url) {
   if (!url) return PLACEHOLDER;
   if (/^(https?:)?\/\//i.test(url) || url.startsWith("data:")) return url;
@@ -321,8 +328,8 @@ function renderDashboard() {
   $("recentList").innerHTML = recent.length
     ? recent.map(article => `
         <div class="row">
-          <img class="row__thumb" src="${previewSrc(article.image_url)}" alt=""
-               onerror="this.src='${PLACEHOLDER}'" />
+          <img class="row__thumb" ${thumbAttrs(article.image_url)} alt="" loading="lazy"
+               onerror="if(!imgFallback(this))this.src='${PLACEHOLDER}'" />
           <div class="row__main">
             <div class="row__title">${esc(article.title)}</div>
             <div class="row__sub">
@@ -386,8 +393,8 @@ function renderArticles() {
         const mine = canEdit(article);
         return `
         <div class="row${mine ? "" : " row--readonly"}">
-          <img class="row__thumb" src="${previewSrc(article.image_url)}" alt=""
-               onerror="this.src='${PLACEHOLDER}'" />
+          <img class="row__thumb" ${thumbAttrs(article.image_url)} alt="" loading="lazy"
+               onerror="if(!imgFallback(this))this.src='${PLACEHOLDER}'" />
 
           <div class="row__main">
             <div class="row__title">${esc(article.title)}</div>
@@ -461,8 +468,8 @@ function renderHome() {
   $("homeList").innerHTML = list.length
     ? list.map((article, index) => `
         <div class="row${index === SLIDER_COUNT - 1 ? " row--slider-edge" : ""}">
-          <img class="row__thumb" src="${previewSrc(article.image_url)}" alt=""
-               onerror="this.src='${PLACEHOLDER}'" />
+          <img class="row__thumb" ${thumbAttrs(article.image_url)} alt="" loading="lazy"
+               onerror="if(!imgFallback(this))this.src='${PLACEHOLDER}'" />
 
           <div class="row__main">
             <div class="row__title">${index + 1}. ${esc(article.title)}</div>
@@ -573,7 +580,7 @@ function renderVideos() {
         return `
           <div class="row">
             <img class="row__thumb row__thumb--wide" src="${previewSrc(YOUTUBE.thumbnailFor(video))}" alt=""
-                 onerror="this.src='${PLACEHOLDER}'" />
+                 onerror="if(!imgFallback(this))this.src='${PLACEHOLDER}'" />
 
             <div class="row__main">
               <div class="row__title">${index + 1}. ${esc(video.title)}</div>
@@ -634,7 +641,7 @@ function pickerHTML(name, url) {
   return `
     <div class="picker" data-picker>
       <img class="picker__preview" src="${previewSrc(url)}" alt=""
-           onerror="this.src='${PLACEHOLDER}'" />
+           onerror="if(!imgFallback(this))this.src='${PLACEHOLDER}'" />
       <div class="picker__side">
         <input type="url" class="picker__url" name="${name}" value="${esc(url || "")}"
                placeholder="https://…  ან  images/photo.jpg" />

@@ -24,6 +24,91 @@
     ? supabase.createClient(cfg.SUPABASE_URL, cfg.SUPABASE_ANON_KEY)
     : null;
 
+  /* ---------- image delivery ----------
+     Pictures in Supabase Storage are never shown at full size straight
+     from Supabase — that is what used up the bandwidth. They go through
+     Vercel's image optimizer instead (see "images" in vercel.json): it
+     downloads the original ONCE, resizes it, turns it into WebP and
+     keeps it on Vercel's CDN for a year. If the optimizer ever fails,
+     imgFallback() quietly switches the picture back to the original. */
+
+  const STORAGE = configured
+    ? cfg.SUPABASE_URL.replace(/\/+$/, "") + "/storage/v1/object/public/"
+    : "";
+  const LOCAL = /^(localhost$|127\.|\[::1\]$|$)/.test(location.hostname);
+
+  const attr = value => String(value == null ? "" : value).replace(/[&<>"']/g, ch => ({
+    "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
+  }[ch]));
+
+  function optimizable(url) {
+    return !!STORAGE && !LOCAL && typeof url === "string" &&
+      url.startsWith(STORAGE) && !/\.(svg|gif)(\?|$)/i.test(url);
+  }
+
+  /** The resized address of a picture. `width` must be listed in vercel.json. */
+  function imgUrl(url, width) {
+    return optimizable(url)
+      ? `/_vercel/image?url=${encodeURIComponent(url)}&w=${width}&q=75`
+      : url;
+  }
+
+  /** src / srcset / sizes for an <img>, ready to drop into HTML. */
+  function imgAttrs(url, widths, sizes) {
+    if (!optimizable(url)) return `src="${attr(url)}"`;
+    const set = widths.map(w => `${imgUrl(url, w)} ${w}w`).join(", ");
+    return `src="${imgUrl(url, widths[widths.length - 1])}" srcset="${set}" ` +
+           `sizes="${attr(sizes)}" data-orig="${attr(url)}"`;
+  }
+
+  /** For onerror: go back to the original once. True if it did. */
+  function imgFallback(el) {
+    const original = el.dataset.orig;
+    if (!original) return false;
+    delete el.dataset.orig;
+    el.removeAttribute("srcset");
+    el.removeAttribute("sizes");
+    el.src = original;
+    return true;
+  }
+
+  window.imgUrl = imgUrl;
+  window.imgAttrs = imgAttrs;
+  window.imgFallback = imgFallback;
+
+  /* Photos from a camera or phone are 3–10 MB and far larger than any
+     screen shows them. Before upload they are scaled down to 1600 px and
+     re-saved (JPEG, or PNG when the picture has transparency). */
+  async function shrinkImage(file) {
+    if (!/^image\/(jpeg|png|webp)$/.test(file.type)) return file;
+    try {
+      const MAX = 1600;
+      const bitmap = await createImageBitmap(file);
+      const scale  = Math.min(1, MAX / Math.max(bitmap.width, bitmap.height));
+      const canvas = document.createElement("canvas");
+      canvas.width  = Math.round(bitmap.width * scale);
+      canvas.height = Math.round(bitmap.height * scale);
+      const ctx = canvas.getContext("2d");
+      ctx.drawImage(bitmap, 0, 0, canvas.width, canvas.height);
+
+      let type = "image/jpeg";
+      if (file.type !== "image/jpeg") {
+        const px = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
+        for (let i = 3; i < px.length; i += 4) {
+          if (px[i] < 255) { type = "image/png"; break; }
+        }
+      }
+
+      const blob = await new Promise(done => canvas.toBlob(done, type, 0.82));
+      if (!blob || blob.size >= file.size) return file;
+
+      const base = file.name.replace(/\.[^.]+$/, "") || "image";
+      return new File([blob], base + (type === "image/png" ? ".png" : ".jpg"), { type });
+    } catch (error) {
+      return file;   // anything unusual — upload the file as it is
+    }
+  }
+
   /* Every Supabase call answers { data, error }. This unwraps it. */
   async function run(query) {
     const { data, error } = await query;
@@ -138,6 +223,7 @@
 
     /** Uploads a file to the public "media" bucket and returns its URL. */
     async uploadImage(file) {
+      file = await shrinkImage(file);
       const ext  = (file.name.split(".").pop() || "jpg").toLowerCase();
       const name = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
 

@@ -75,9 +75,12 @@ function articleCard(article) {
   return `
     <a href="${articleUrl(article)}" class="card">
       <div class="card__thumb">
-        <img src="${imageOr(article.image_url)}" alt="${esc(article.title)}"
+        <img ${article.image_url
+               ? imgAttrs(article.image_url, [320, 640], "(max-width: 600px) 92vw, (max-width: 1050px) 46vw, 320px")
+               : `src="${PLACEHOLDER}"`} alt="${esc(article.title)}"
              class="card__img ${article.image_fit === "contain" ? "card__img--contain" : ""}"
-             loading="lazy" onerror="this.src='${PLACEHOLDER}';this.classList.add('card__img--contain')" />
+             loading="lazy" decoding="async"
+             onerror="if(!imgFallback(this)){this.src='${PLACEHOLDER}';this.classList.add('card__img--contain')}" />
         ${category ? `<span class="card__badge">${esc(category)}</span>` : ""}
       </div>
       <div class="card__body">

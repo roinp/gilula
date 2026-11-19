@@ -41,9 +41,11 @@ function renderSlider(articles) {
           </div>
           <div class="slide__visual${article.image_url ? "" : " no-photo"}">
             ${article.image_url
-              ? `<img src="${esc(article.image_url)}" alt="${esc(article.title)}"
+              ? `<img ${imgAttrs(article.image_url, [640, 960], "(max-width: 1050px) 320px, 420px")}
+                      alt="${esc(article.title)}"
                       class="slide__photo${article.image_fit === "contain" ? " slide__photo--contain" : ""}"
-                      onerror="this.parentElement.classList.add('no-photo');this.remove()" />`
+                      ${i === 0 ? 'fetchpriority="high"' : 'loading="lazy" decoding="async"'}
+                      onerror="if(!imgFallback(this)){this.parentElement.classList.add('no-photo');this.remove()}" />`
               : ""}
             <span class="slide__number">${i + 1}</span>
           </div>

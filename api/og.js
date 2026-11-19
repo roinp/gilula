@@ -150,8 +150,24 @@ function originOf(req) {
    the request stays fast. If anything goes wrong we simply leave the
    tags out — the card still works, it is just slower to appear. */
 
-/** {width, height, type} of a picture, or null if it cannot be read. */
+/* A picture's size never changes (a new picture gets a new address), so
+   it is remembered for as long as this server instance lives instead of
+   being asked from Supabase again on every article view. A failure is
+   remembered for ten minutes only. */
+const sizeCache = new Map();
+
 async function imageSize(url) {
+  const hit = sizeCache.get(url);
+  if (hit && (hit.size || Date.now() - hit.at < 600000)) return hit.size;
+
+  const size = await readImageSize(url);
+  if (sizeCache.size > 2000) sizeCache.clear();
+  sizeCache.set(url, { size, at: Date.now() });
+  return size;
+}
+
+/** {width, height, type} of a picture, or null if it cannot be read. */
+async function readImageSize(url) {
   let bytes;
   try {
     const response = await fetch(url, {
